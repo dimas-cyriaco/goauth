@@ -21,7 +21,10 @@ jobs:
         run: bash install.sh
 
       - name: Set secrets
-        run: echo "SMTPPassword: \"smtp-test-password\"" > .secrets.local.cue
+        run: |
+          cat <<EOF > .secrets.local.cue
+          SMTPPassword: 'smtp-test-password'
+          EOF
 
       - name: Test
         run: /home/runner/.encore/bin/encore test ./...
