@@ -20,5 +20,8 @@ jobs:
       - name: Install Encore CLI
         run: bash install.sh
 
+      - name: Set secrets
+        run: echo "SMTPPassword: \"smtp-test-password\"" > .secrets.local.cue
+
       - name: Test
         run: /home/runner/.encore/bin/encore test ./...
