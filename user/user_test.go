@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"encore.app/utils"
+	"encore.dev/et"
 	"github.com/go-faker/faker/v4"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
@@ -28,12 +29,14 @@ func (suite *UserTestSuit) SetupTest() {
 	suite.service = service
 }
 
-func (suite *UserTestSuit) TestCreateUser() {
+func (suite *UserTestSuit) TestRegistration() {
 	// Act
 
-	utils.Must(suite.service.Create(suite.ctx, &CreateParams{
-		Name:  faker.Name(),
-		Email: faker.Email(),
+	password := faker.Word()
+	utils.Must(suite.service.Registration(suite.ctx, &RegistrationParams{
+		Email:                faker.Email(),
+		Password:             password,
+		PasswordConfirmation: password,
 	}))
 
 	// Assert
@@ -42,11 +45,54 @@ func (suite *UserTestSuit) TestCreateUser() {
 	assert.NotNil(suite.T(), user)
 }
 
-func (suite *UserTestSuit) TestCreateUserValidatesPresenceOfName() {
+func (suite *UserTestSuit) TestRegistrationValidatesPresenceOfEmail() {
 	// Arrange
 
-	params := CreateParams{
+	password := faker.UUIDDigit()
+	params := RegistrationParams{
+		// Without Email
+		Password:             password,
+		PasswordConfirmation: password,
+	}
+
+	// Act
+
+	validationError := params.Validate()
+
+	// Assert
+
+	assert.NotNil(suite.T(), validationError)
+	assert.Equal(suite.T(), "Key: 'RegistrationParams.Email' Error:Field validation for 'Email' failed on the 'required' tag", validationError.Error())
+}
+
+func (suite *UserTestSuit) TestRegistrationValidatesFormatOfEmail() {
+	// Arrange
+
+	password := faker.UUIDDigit()
+	params := RegistrationParams{
+		Email:                faker.DomainName(), // Email with wrong format.
+		Password:             password,
+		PasswordConfirmation: password,
+	}
+
+	// Act
+
+	validationError := params.Validate()
+
+	// Assert
+
+	assert.NotNil(suite.T(), validationError)
+	expectedError := "Key: 'RegistrationParams.Email' Error:Field validation for 'Email' failed on the 'email' tag"
+	assert.Equal(suite.T(), expectedError, validationError.Error())
+}
+
+func (suite *UserTestSuit) TestRegistrationValidatesPresenceOfPassword() {
+	// Arrange
+
+	params := RegistrationParams{
 		Email: faker.Email(),
+		// No Password
+		PasswordConfirmation: faker.UUIDDigit(),
 	}
 
 	// Act
@@ -56,14 +102,17 @@ func (suite *UserTestSuit) TestCreateUserValidatesPresenceOfName() {
 	// Assert
 
 	assert.NotNil(suite.T(), validationError)
-	assert.Equal(suite.T(), "Key: 'CreateParams.Name' Error:Field validation for 'Name' failed on the 'required' tag", validationError.Error())
+	expectedError := "Key: 'RegistrationParams.Password' Error:Field validation for 'Password' failed on the 'required' tag"
+	assert.Contains(suite.T(), validationError.Error(), expectedError)
 }
 
-func (suite *UserTestSuit) TestCreateUserValidatesPresenceOfEmail() {
+func (suite *UserTestSuit) TestRegistrationValidatesPresenceOfPasswordConfirmation() {
 	// Arrange
 
-	params := CreateParams{
-		Name: faker.Word(),
+	params := RegistrationParams{
+		Email:    faker.Email(),
+		Password: faker.UUIDDigit(),
+		// No PasswordConfirmation
 	}
 
 	// Act
@@ -73,15 +122,17 @@ func (suite *UserTestSuit) TestCreateUserValidatesPresenceOfEmail() {
 	// Assert
 
 	assert.NotNil(suite.T(), validationError)
-	assert.Equal(suite.T(), "Key: 'CreateParams.Email' Error:Field validation for 'Email' failed on the 'required' tag", validationError.Error())
+	expectedError := "Key: 'RegistrationParams.PasswordConfirmation' Error:Field validation for 'PasswordConfirmation' failed on the 'required' tag"
+	assert.Contains(suite.T(), validationError.Error(), expectedError)
 }
 
-func (suite *UserTestSuit) TestCreateUserValidatesFormatOfEmail() {
+func (suite *UserTestSuit) TestRegistrationValidatesPasswordConfirmationMatch() {
 	// Arrange
 
-	params := CreateParams{
-		Name:  faker.Word(),
-		Email: faker.Word(),
+	params := RegistrationParams{
+		Email:                faker.Email(),
+		Password:             faker.UUIDDigit(),
+		PasswordConfirmation: "this-will-not-match-the-password",
 	}
 
 	// Act
@@ -91,15 +142,99 @@ func (suite *UserTestSuit) TestCreateUserValidatesFormatOfEmail() {
 	// Assert
 
 	assert.NotNil(suite.T(), validationError)
-	assert.Equal(suite.T(), "Key: 'CreateParams.Email' Error:Field validation for 'Email' failed on the 'email' tag", validationError.Error())
+	expectedError := "Key: 'RegistrationParams.PasswordConfirmation' Error:Field validation for 'PasswordConfirmation' failed on the 'eqcsfield' tag"
+	assert.Contains(suite.T(), validationError.Error(), expectedError)
+}
+
+func (suite *UserTestSuit) TestRegistrationHashesPassword() {
+	// Arrange
+
+	params := RegistrationParams{}
+	faker.FakeData(&params)
+
+	// Act
+
+	createdUser := utils.Must(suite.service.Registration(suite.ctx, &params))
+
+	// Assert
+
+	assert.NotEmpty(suite.T(), createdUser.HashedPassword)
+	assert.NotEqual(suite.T(), params.Password, createdUser.HashedPassword)
+}
+
+func (suite *UserTestSuit) TestRegistrationRequiresEmailToBeUnique() {
+	// Arrange
+
+	password := faker.Word()
+	params := RegistrationParams{
+		Email:                faker.Email(),
+		Password:             password,
+		PasswordConfirmation: password,
+	}
+	utils.Must(suite.service.Registration(suite.ctx, &params))
+
+	// Act
+
+	_, err := suite.service.Registration(suite.ctx, &params)
+
+	// Assert
+
+	assert.NotNil(suite.T(), err)
+	assert.ErrorContains(suite.T(), err, "Invalid Argument")
+}
+
+func (suite *UserTestSuit) TestRegistrationTrimsEmailAndPassword() {
+	// Arrange
+
+	password := faker.Word()
+	email := faker.Email()
+	params := RegistrationParams{
+		Email:                "  " + email + "   ",
+		Password:             "  " + password + "   ",
+		PasswordConfirmation: password,
+	}
+
+	// Act
+
+	utils.Must(params.Validate(), nil)
+
+	// Assert
+
+	// user, _ := suite.service.Get(suite.ctx, 1)
+	assert.Equal(suite.T(), params.Email, email)
+	assert.Equal(suite.T(), params.Password, password)
+	assert.Equal(suite.T(), params.PasswordConfirmation, password)
+}
+
+func (suite *UserTestSuit) TestRegistrationPublishToSignupsTopic() {
+	// Arrange
+
+	suite.T().Parallel()
+
+	password := faker.Word()
+	params := RegistrationParams{
+		Email:                faker.Email(),
+		Password:             password,
+		PasswordConfirmation: password,
+	}
+
+	// Act
+
+	utils.Must(suite.service.Registration(suite.ctx, &params))
+
+	// Assert
+
+	// Get all published messages on the Signups topic from this test.
+	msgs := et.Topic(Signups).PublishedMessages()
+	assert.Len(suite.T(), msgs, 1)
 }
 
 func (suite *UserTestSuit) TestGetUser() {
 	// Arrange
 
-	createdUser := utils.Must(suite.service.Create(suite.ctx, &CreateParams{
-		Name: faker.Name(),
-	}))
+	a := RegistrationParams{}
+	faker.FakeData(&a)
+	createdUser := utils.Must(suite.service.Registration(suite.ctx, &a))
 
 	// Act
 
@@ -107,9 +242,9 @@ func (suite *UserTestSuit) TestGetUser() {
 
 	// Assert
 
-	assert.Equal(suite.T(), user.Name, createdUser.Name)
+	assert.Equal(suite.T(), user.Email, createdUser.Email)
 }
 
-func TestCreateUserTestSuite(t *testing.T) {
+func TestRegistrationTestSuite(t *testing.T) {
 	suite.Run(t, new(UserTestSuit))
 }

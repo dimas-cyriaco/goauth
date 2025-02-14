@@ -1,5 +1,3 @@
-# Simple Justfile for a Go project
-
 # Build the application
 all:
     build
@@ -16,8 +14,8 @@ run:
 
 # Test the application
 test:
-    go run gotest.tools/gotestsum --raw-command -- encore test ./... -json
+    gotestsum --raw-command -- encore test ./... -json
 
 # Test the application
 test-watch:
-    go run gotest.tools/gotestsum --watch --raw-command -- encore test ./... -json
+    gotestsum --watch --raw-command -- encore test ./... -json

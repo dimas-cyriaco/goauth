@@ -1,20 +1,9 @@
-POST http://localhost:4000/users
+POST http://localhost:4000/sign_up
 
 {
-  "name": "Dimas Cyriaco"
+  "email": "dev-user@goauth.com",
+  "password": "secretpassword",
+  "passwordConfirmation": "secretpassword"
 }
 
 HTTP 200
-
-[Captures]
-user_id: jsonpath "$['id']"
-
-GET http://localhost:4000/users/{{user_id}}
-
-HTTP 200
-
-POST http://localhost:4000/users
-
-{}
-
-HTTP 400
