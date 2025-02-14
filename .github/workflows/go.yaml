@@ -7,7 +7,7 @@ on:
     branches: ["main"]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -20,11 +20,9 @@ jobs:
       - name: Install Encore CLI
         run: bash install.sh
 
-      - name: Set secrets
+      - name: Log in to Encore
         run: |
-          cat <<EOF > .secrets.local.cue
-          SMTPPassword: 'smtp-test-password'
-          EOF
+          encore auth login --auth-key="${{ secrets.ENCORE_AUTH_KEY }}"
 
       - name: Test
         run: /home/runner/.encore/bin/encore test ./...
