@@ -22,7 +22,7 @@ jobs:
 
       - name: Log in to Encore
         run: |
-          encore auth login --auth-key="${{ secrets.ENCORE_AUTH_KEY }}"
+          /home/runner/.encore/bin/encore auth login --auth-key="${{ secrets.ENCORE_AUTH_KEY }}"
 
       - name: Test
         run: /home/runner/.encore/bin/encore test ./...
