@@ -1,9 +1,9 @@
 POST http://localhost:4000/sign_up
 
 {
-  "email": "dimas.cyriaco+1@gmail.com",
-  "password": "secretpassword",
-  "passwordConfirmation": "secretpassword"
+  "email": "{{user_email}}",
+  "password": "{{user_password}}",
+  "passwordConfirmation": "{{user_password}}"
 }
 
 HTTP 200
