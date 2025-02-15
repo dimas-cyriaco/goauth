@@ -1,7 +1,7 @@
 POST http://localhost:4000/sign_up
 
 {
-  "email": "dev-user@goauth.com",
+  "email": "dimas.cyriaco+1@gmail.com",
   "password": "secretpassword",
   "passwordConfirmation": "secretpassword"
 }

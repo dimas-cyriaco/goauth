@@ -2,7 +2,10 @@ package user
 
 import (
 	"context"
+	"fmt"
+	"strconv"
 
+	tokengenerator "encore.app/internal/token_generator"
 	"encore.app/utils"
 	"encore.dev/config"
 	"encore.dev/pubsub"
@@ -20,6 +23,12 @@ type MailConfig struct {
 }
 
 var mailConfig *MailConfig = config.Load[*MailConfig]()
+
+type APIConfig struct {
+	BaseURL config.String // API Base URL
+}
+
+var apiConfig *APIConfig = config.Load[*APIConfig]()
 
 var secrets struct {
 	SMTPPassword string // SMTP server password
@@ -57,10 +66,15 @@ func SendWelcomeEmail(ctx context.Context, event *SignupEvent, mailer utils.Mail
 		SendEmailsFrom: mailConfig.SendEmailsFrom(),
 	}
 
+	link, err := generateEmailVerificationLinkForUser(&user)
+	if err != nil {
+		return err
+	}
+
 	err = mailer.SendEmail(
 		user.Email,
 		"Welcome to GOAuth",
-		"Welcome to GOAuth. To verify your email click this link",
+		fmt.Sprintf("Welcome to GOAuth. To verify your email click this link: %s", link),
 		&config,
 	)
 	if err != nil {
@@ -74,4 +88,21 @@ func SendWelcomeEmail(ctx context.Context, event *SignupEvent, mailer utils.Mail
 	}
 
 	return nil
+}
+
+func generateEmailVerificationLinkForUser(user *User) (string, error) {
+	token, err := generateEmailVerificationTokenForUser(user)
+	if err != nil {
+		return "", err
+	}
+
+	link := fmt.Sprintf("%s/verify_email?verification_token=%s", apiConfig.BaseURL(), token)
+
+	return link, nil
+}
+
+func generateEmailVerificationTokenForUser(user *User) (string, error) {
+	purpose := tokengenerator.EmailVerification
+	payload := map[string]string{"UserID": strconv.Itoa(int(user.ID))}
+	return tokengenerator.GenerateTokenFor(purpose, payload)
 }

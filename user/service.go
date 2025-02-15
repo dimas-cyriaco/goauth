@@ -1,6 +1,8 @@
 package user
 
 import (
+	"time"
+
 	"encore.dev/storage/sqldb"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -12,7 +14,10 @@ type User struct {
 	// Email is the user's Email.
 	Email string `json:"email" encore:"sensitive"`
 	// HashedPassword is the hashed version of the user's password.
-	HashedPassword string `encore:"sensitive"`
+	HashedPassword  string     `encore:"sensitive"`
+	CreatedAt       time.Time  `json:"created_at"`
+	UpdatedAt       time.Time  `json:"updated_at"`
+	EmailVerifiedAt *time.Time `json:"email_verified_at"`
 }
 
 //encore:service

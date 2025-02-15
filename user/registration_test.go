@@ -33,7 +33,7 @@ func (suite *UserTestSuit) TestRegistration() {
 	// Act
 
 	password := faker.Word()
-	utils.Must(suite.service.Registration(suite.ctx, &RegistrationParams{
+	response := utils.Must(suite.service.Registration(suite.ctx, &RegistrationParams{
 		Email:                faker.Email(),
 		Password:             password,
 		PasswordConfirmation: password,
@@ -41,8 +41,10 @@ func (suite *UserTestSuit) TestRegistration() {
 
 	// Assert
 
-	user, _ := suite.service.Get(suite.ctx, 1)
+	user, _ := suite.service.Get(suite.ctx, response.ID)
+	assert.NotNil(suite.T(), response)
 	assert.NotNil(suite.T(), user)
+	assert.Equal(suite.T(), response.ID, user.ID)
 }
 
 func (suite *UserTestSuit) TestRegistrationValidatesPresenceOfEmail() {
@@ -154,12 +156,14 @@ func (suite *UserTestSuit) TestRegistrationHashesPassword() {
 
 	// Act
 
-	createdUser := utils.Must(suite.service.Registration(suite.ctx, &params))
+	response := utils.Must(suite.service.Registration(suite.ctx, &params))
 
 	// Assert
 
-	assert.NotEmpty(suite.T(), createdUser.HashedPassword)
-	assert.NotEqual(suite.T(), params.Password, createdUser.HashedPassword)
+	user, _ := suite.service.Get(suite.ctx, response.ID)
+
+	assert.NotEmpty(suite.T(), user.HashedPassword)
+	assert.NotEqual(suite.T(), params.Password, user.HashedPassword)
 }
 
 func (suite *UserTestSuit) TestRegistrationRequiresEmailToBeUnique() {
@@ -234,15 +238,15 @@ func (suite *UserTestSuit) TestGetUser() {
 
 	a := RegistrationParams{}
 	faker.FakeData(&a)
-	createdUser := utils.Must(suite.service.Registration(suite.ctx, &a))
+	response := utils.Must(suite.service.Registration(suite.ctx, &a))
 
 	// Act
 
-	user := utils.Must(suite.service.Get(suite.ctx, createdUser.ID))
+	user := utils.Must(suite.service.Get(suite.ctx, response.ID))
 
 	// Assert
 
-	assert.Equal(suite.T(), user.Email, createdUser.Email)
+	assert.Equal(suite.T(), user.Email, a.Email)
 }
 
 func TestRegistrationTestSuite(t *testing.T) {

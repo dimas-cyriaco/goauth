@@ -15,3 +15,9 @@ SMTPHost: "smtp.gmail.com"
 SMTPPort: 587
 SMTPUsername: "dimascyriaco@gmail.com"
 
+BaseURL: [
+    if #Meta.Environment.Type == "production" { "https://goauth.com" },
+    if #Meta.Environment.Name == "staging"    { "https://staging.goauth.com" },
+
+    "http://localhost:4000",
+][0]

@@ -18,6 +18,10 @@ type RegistrationParams struct {
 	PasswordConfirmation string `mod:"trim" validate:"required,eqcsfield=Password" encore:"sensitive"`
 }
 
+type RegistrationResponse struct {
+	ID int `json:"id"`
+}
+
 func (params *RegistrationParams) Validate() error {
 	validate := validator.New()
 	conform := modifiers.New()
@@ -31,7 +35,7 @@ func (params *RegistrationParams) Validate() error {
 }
 
 //encore:api public method=POST path=/sign_up
-func (s *Service) Registration(ctx context.Context, params *RegistrationParams) (*User, error) {
+func (s *Service) Registration(ctx context.Context, params *RegistrationParams) (*RegistrationResponse, error) {
 	hashedPassword, err := hashPassword(params.Password)
 	if err != nil {
 		rlog.Error("Error hashing User password.", "err", err)
@@ -59,7 +63,7 @@ func (s *Service) Registration(ctx context.Context, params *RegistrationParams) 
 		rlog.Error("Error publishing SignupEvent.", "err", err)
 	}
 
-	return user, nil
+	return &RegistrationResponse{ID: user.ID}, nil
 }
 
 func hashPassword(password string) (string, error) {
