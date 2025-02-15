@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"encore.app/utils"
@@ -44,11 +45,14 @@ func (suite *SendWelcomeEmailTestSuit) TestSendWelcomeEmail() {
 
 	a := RegistrationParams{}
 	faker.FakeData(&a)
-	createdUser := utils.Must(suite.registrationService.Registration(suite.ctx, &a))
+	response := utils.Must(suite.registrationService.Registration(suite.ctx, &a))
 
 	mockMailer := new(MockMailer)
 
-	mockMailer.On("SendEmail", a.Email, "Welcome to GOAuth", "Welcome to GOAuth. To verify your email click this link", &utils.MailerConfig{
+	link := utils.Must(generateEmailVerificationLinkForUser(&User{ID: response.ID}))
+	emailBody := fmt.Sprintf("Welcome to GOAuth. To verify your email click this link: %s", link)
+
+	mockMailer.On("SendEmail", a.Email, "Welcome to GOAuth", emailBody, &utils.MailerConfig{
 		SendEmailsFrom: mailConfig.SendEmailsFrom(),
 		SMTPHost:       mailConfig.SMTPHost(),
 		SMTPPort:       mailConfig.SMTPPort(),
@@ -59,8 +63,10 @@ func (suite *SendWelcomeEmailTestSuit) TestSendWelcomeEmail() {
 	// Act
 
 	result := SendWelcomeEmail(suite.ctx, &SignupEvent{
-		UserID: createdUser.ID,
+		UserID: response.ID,
 	}, mockMailer)
+
+	// Assert
 
 	assert.Nil(suite.T(), result)
 }
