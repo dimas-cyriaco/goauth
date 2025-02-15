@@ -4,3 +4,4 @@ encore.gen.cue
 /encore.gen
 Session.vim
 todo.md
+hurl/local.env

@@ -76,6 +76,7 @@ func VerifyToken(purpose Purpose, token string) (bool, error) {
 
 	if !isValid {
 		rlog.Error("Invalid token", "token", token)
+		return false, err
 	}
 
 	payload, err := decodePayload(segments.EncodedPayload)
