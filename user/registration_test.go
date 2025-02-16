@@ -229,7 +229,7 @@ func (suite *UserTestSuit) TestRegistrationPublishToSignupsTopic() {
 	// Assert
 
 	// Get all published messages on the Signups topic from this test.
-	msgs := et.Topic(Signups).PublishedMessages()
+	msgs := et.Topic(EmailVerificationRequested).PublishedMessages()
 	assert.Len(suite.T(), msgs, 1)
 }
 

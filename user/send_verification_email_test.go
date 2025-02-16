@@ -23,13 +23,13 @@ func (m *MockMailer) SendEmail(to string, subject string, body string, config *u
 	return args.Error(0)
 }
 
-type SendWelcomeEmailTestSuit struct {
+type SendVerificationEmailTestSuit struct {
 	suite.Suite
 	ctx                 context.Context
 	registrationService *Service
 }
 
-func (suite *SendWelcomeEmailTestSuit) SetupTest() {
+func (suite *SendVerificationEmailTestSuit) SetupTest() {
 	ctx := context.Background()
 
 	service := utils.Must(initService())
@@ -38,7 +38,7 @@ func (suite *SendWelcomeEmailTestSuit) SetupTest() {
 	suite.registrationService = service
 }
 
-func (suite *SendWelcomeEmailTestSuit) TestSendWelcomeEmail() {
+func (suite *SendVerificationEmailTestSuit) TestSendVerificationEmail() {
 	// Arrange
 
 	et.SetCfg(mailConfig.SendEmails, true)
@@ -62,7 +62,7 @@ func (suite *SendWelcomeEmailTestSuit) TestSendWelcomeEmail() {
 
 	// Act
 
-	result := SendWelcomeEmail(suite.ctx, &SignupEvent{
+	result := SendVerificationEmail(suite.ctx, &EmailVerificationRequestedEvent{
 		UserID: response.ID,
 	}, mockMailer)
 
@@ -71,6 +71,6 @@ func (suite *SendWelcomeEmailTestSuit) TestSendWelcomeEmail() {
 	assert.Nil(suite.T(), result)
 }
 
-func TestSendWelcomeEmailTestSuite(t *testing.T) {
-	suite.Run(t, new(SendWelcomeEmailTestSuit))
+func TestSendVerificationEmailTestSuite(t *testing.T) {
+	suite.Run(t, new(SendVerificationEmailTestSuit))
 }

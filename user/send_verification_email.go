@@ -35,19 +35,19 @@ var secrets struct {
 }
 
 var _ = pubsub.NewSubscription(
-	Signups, "send-welcome-email",
-	pubsub.SubscriptionConfig[*SignupEvent]{
+	EmailVerificationRequested, "email-verification-requested",
+	pubsub.SubscriptionConfig[*EmailVerificationRequestedEvent]{
 		Handler: handler,
 	},
 )
 
 // For dependency injection.
-func handler(ctx context.Context, event *SignupEvent) error {
+func handler(ctx context.Context, event *EmailVerificationRequestedEvent) error {
 	mailer := &utils.GomailMailer{}
-	return SendWelcomeEmail(ctx, event, mailer)
+	return SendVerificationEmail(ctx, event, mailer)
 }
 
-func SendWelcomeEmail(ctx context.Context, event *SignupEvent, mailer utils.Mailer) error {
+func SendVerificationEmail(ctx context.Context, event *EmailVerificationRequestedEvent, mailer utils.Mailer) error {
 	db, err := gorm.Open(postgres.New(postgres.Config{Conn: db.Stdlib()}))
 	if err != nil {
 		return err

@@ -58,9 +58,12 @@ func (s *Service) Registration(ctx context.Context, params *RegistrationParams) 
 		return nil, &errs.Error{Code: errs.Unknown, Message: "Unknown error"}
 	}
 
-	_, err = Signups.Publish(ctx, &SignupEvent{UserID: user.ID})
+	_, err = EmailVerificationRequested.Publish(
+		ctx,
+		&EmailVerificationRequestedEvent{UserID: user.ID},
+	)
 	if err != nil {
-		rlog.Error("Error publishing SignupEvent.", "err", err)
+		rlog.Error("Error publishing EmailVerificationRequestedEvent.", "err", err)
 	}
 
 	return &RegistrationResponse{ID: user.ID}, nil
