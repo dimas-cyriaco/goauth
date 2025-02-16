@@ -18,6 +18,8 @@ func (s *Service) RequestVerificationEmail(ctx context.Context, params *RequestV
 			return nil
 		}
 
+		rlog.Error("Error reading User from DB.", "err", err)
+
 		return err
 	}
 
