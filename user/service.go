@@ -17,7 +17,7 @@ type User struct {
 	HashedPassword  string     `encore:"sensitive"`
 	CreatedAt       time.Time  `json:"created_at"`
 	UpdatedAt       time.Time  `json:"updated_at"`
-	EmailVerifiedAt *time.Time `json:"email_verified_at"`
+	EmailVerifiedAt *time.Time `json:"email_verified_at" faker:"-"`
 }
 
 //encore:service

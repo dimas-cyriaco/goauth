@@ -1,4 +1,4 @@
-POST http://localhost:4000/sign_up
+POST {{base_url}}/sign_up
 
 {
   "email": "{{user_email}}",
