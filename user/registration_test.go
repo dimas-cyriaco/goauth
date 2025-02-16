@@ -210,10 +210,8 @@ func (suite *UserTestSuit) TestRegistrationTrimsEmailAndPassword() {
 	assert.Equal(suite.T(), params.PasswordConfirmation, password)
 }
 
-func (suite *UserTestSuit) TestRegistrationPublishToSignupsTopic() {
+func (suite *UserTestSuit) TestRegistrationPublishToTopic() {
 	// Arrange
-
-	suite.T().Parallel()
 
 	password := faker.Word()
 	params := RegistrationParams{
@@ -228,7 +226,7 @@ func (suite *UserTestSuit) TestRegistrationPublishToSignupsTopic() {
 
 	// Assert
 
-	// Get all published messages on the Signups topic from this test.
+	// Get all published messages on the EmailVerificationRequested topic from this test.
 	msgs := et.Topic(EmailVerificationRequested).PublishedMessages()
 	assert.Len(suite.T(), msgs, 1)
 }
