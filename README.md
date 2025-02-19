@@ -2,7 +2,7 @@
 
 An experimental, self-hostable, OAuth 2 server.
 
-## Dev Dependencies
+## ⚡️ Requirements
 
 ```
 brew install just
