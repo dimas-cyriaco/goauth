@@ -20,6 +20,13 @@ type User struct {
 	EmailVerifiedAt *time.Time `json:"email_verified_at" faker:"-"`
 }
 
+type Session struct {
+	ID        int       `json:"id"`
+	UserID    int       `json:"user_id"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
+
 //encore:service
 type Service struct {
 	db *gorm.DB

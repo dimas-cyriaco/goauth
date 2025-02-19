@@ -28,7 +28,7 @@ func (suite *LoginTestSuite) SetupTest() {
 func (suite *LoginTestSuite) TestLogin() {
 	// Act
 
-	password := "foo"
+	password := faker.Password()
 	email := faker.Email()
 
 	a := RegistrationParams{
@@ -102,7 +102,37 @@ func (suite *LoginTestSuite) TestShouldFailWithWrongEmail() {
 	assert.ErrorContains(suite.T(), err, "wrong email or password")
 }
 
-func (suite *LoginTestSuite) TestShouldCreateSession()      {}
+func (suite *LoginTestSuite) TestShouldCreateSession() {
+	// Act
+
+	password := faker.Password()
+	email := faker.Email()
+
+	a := RegistrationParams{
+		Email:                email,
+		Password:             password,
+		PasswordConfirmation: password,
+	}
+	utils.Must(suite.service.Registration(suite.ctx, &a))
+
+	var countBefore int64
+	suite.service.db.Model(&Session{}).Count(&countBefore)
+
+	// Act
+
+	utils.Must(suite.service.Login(suite.ctx, &LoginParams{
+		Email:    email,
+		Password: password,
+	}), nil)
+
+	// Assert
+
+	var countAfter int64
+	suite.service.db.Model(&Session{}).Count(&countAfter)
+
+	assert.Equal(suite.T(), countBefore, countAfter-1)
+}
+
 func (suite *LoginTestSuite) TestShouldReturnSessionToken() {}
 func (suite *LoginTestSuite) TestShouldReturnCRSFToken()    {}
 

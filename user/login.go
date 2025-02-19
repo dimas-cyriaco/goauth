@@ -29,5 +29,13 @@ func (s *Service) Login(ctx context.Context, params *LoginParams) error {
 		return errs.B().Code(errs.InvalidArgument).Msg("wrong email or password").Err()
 	}
 
+	session := Session{
+		UserID: user.ID,
+	}
+	err = s.db.Create(&session).Error
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
