@@ -63,7 +63,7 @@ func (suite *LoginTestSuite) TestShouldFailWithWrongPassword() {
 	// Act
 
 	_, err := suite.service.Login(suite.ctx, &LoginParams{
-		Email:    faker.Email(),
+		Email:    suite.email,
 		Password: "wrong-password",
 	})
 
@@ -138,7 +138,25 @@ func (suite *LoginTestSuite) TestShouldReturnSessionToken() {
 	assert.Equal(suite.T(), payload["SessionID"], strconv.Itoa(session.ID))
 }
 
-func (suite *LoginTestSuite) TestShouldReturnCRSFToken() {}
+func (suite *LoginTestSuite) TestShouldReturnCRSFToken() {
+	// Act
+
+	suite.registerUser()
+
+	// Act
+
+	result := utils.Must(suite.service.Login(suite.ctx, &LoginParams{
+		Email:    suite.email,
+		Password: suite.password,
+	}))
+
+	// Assert
+
+	assert.NotEmpty(suite.T(), result.CSRFToken)
+
+	sessionPayload, _ := tokengenerator.GetPayloadForToken(tokengenerator.SessionToken, result.SessionToken)
+	assert.Equal(suite.T(), result.CSRFToken, sessionPayload["CSRFToken"])
+}
 
 func TestLoginTestSuite(t *testing.T) {
 	suite.Run(t, new(LoginTestSuite))

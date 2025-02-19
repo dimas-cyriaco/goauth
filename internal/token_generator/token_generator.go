@@ -25,6 +25,7 @@ const (
 	EmailVerification Purpose = 0
 	PasswordRecovery  Purpose = 1
 	SessionToken      Purpose = 2
+	CSRFToken         Purpose = 3
 )
 
 const (
