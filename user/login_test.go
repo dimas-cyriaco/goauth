@@ -32,12 +32,6 @@ func (suite *LoginTestSuite) SetupTest() {
 	suite.email = faker.Email()
 }
 
-//
-// func (suite *LoginTestSuite) TeardownTest() {
-// 	suite.password = ""
-// 	suite.email = ""
-// }
-
 func (suite *LoginTestSuite) TestLogin() {
 	// Act
 
