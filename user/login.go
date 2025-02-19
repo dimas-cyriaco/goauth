@@ -2,7 +2,9 @@ package user
 
 import (
 	"context"
+	"strconv"
 
+	tokengenerator "encore.app/internal/token_generator"
 	"encore.dev/beta/errs"
 )
 
@@ -12,8 +14,12 @@ type LoginParams struct {
 	Password string `encore:"sensitive"`
 }
 
+type LoginResponse struct {
+	SessionToken string `header:"Set-Cookie"`
+}
+
 //encore:api public method=POST path=/login
-func (s *Service) Login(ctx context.Context, params *LoginParams) error {
+func (s *Service) Login(ctx context.Context, params *LoginParams) (*LoginResponse, error) {
 	var user User
 
 	err := s.db.
@@ -21,21 +27,29 @@ func (s *Service) Login(ctx context.Context, params *LoginParams) error {
 		First(&user).
 		Error
 	if err != nil {
-		return errs.B().Code(errs.InvalidArgument).Msg("wrong email or password").Err()
+		return nil, errs.B().Code(errs.InvalidArgument).Msg("wrong email or password").Err()
 	}
 
 	passwordMatches := validatePassword(user.HashedPassword, params.Password)
 	if !passwordMatches {
-		return errs.B().Code(errs.InvalidArgument).Msg("wrong email or password").Err()
+		return nil, errs.B().Code(errs.InvalidArgument).Msg("wrong email or password").Err()
 	}
 
-	session := Session{
-		UserID: user.ID,
-	}
+	session := Session{UserID: user.ID}
 	err = s.db.Create(&session).Error
 	if err != nil {
-		return err
+		// TODO: melhorar erro
+		return nil, err
 	}
 
-	return nil
+	token, err := tokengenerator.GenerateTokenFor(tokengenerator.SessionToken, map[string]string{"SessionID": strconv.Itoa(int(session.ID))})
+	if err != nil {
+		return nil, err
+	}
+
+	response := LoginResponse{
+		SessionToken: token,
+	}
+
+	return &response, nil
 }
