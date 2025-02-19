@@ -105,7 +105,7 @@ func (suite *LoginTestSuite) TestShouldCreateSession() {
 	var countAfter int64
 	suite.service.db.Model(&Session{}).Count(&countAfter)
 
-	assert.Equal(suite.T(), countBefore, countAfter-1)
+	assert.Equal(suite.T(), countBefore+1, countAfter)
 }
 
 func (suite *LoginTestSuite) TestShouldReturnSessionToken() {
