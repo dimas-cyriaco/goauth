@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
-	tokengenerator "encore.app/internal/token_generator"
+	"encore.app/internal/tokens"
 	"encore.dev/beta/auth"
 	"encore.dev/beta/errs"
 	"encore.dev/storage/sqldb"
@@ -24,7 +24,7 @@ func AuthHandler(ctx context.Context, data *AuthData) (auth.UID, *AuthData, erro
 }
 
 func HandleAuthentication(database *sqldb.Database, data *AuthData) (auth.UID, *AuthData, error) {
-	sessionPayload, err := tokengenerator.GetPayloadForToken(tokengenerator.SessionToken, data.SessionToken.Value)
+	sessionPayload, err := tokens.GetPayloadForToken(tokens.SessionToken, data.SessionToken.Value)
 	if err != nil {
 		return auth.UID(""), data, err
 	}

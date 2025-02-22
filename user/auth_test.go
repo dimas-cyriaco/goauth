@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"testing"
 
-	tokengenerator "encore.app/internal/token_generator"
+	"encore.app/internal/tokens"
 	"encore.app/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
@@ -21,7 +21,7 @@ func (suite *AuthTestSuite) TestAuth() {
 
 	response := suite.Login()
 	sessionCookie := findCookieByName(response.Result().Cookies(), "session_token")
-	payload, _ := tokengenerator.GetPayloadForToken(tokengenerator.SessionToken, sessionCookie.Value)
+	payload, _ := tokens.GetPayloadForToken(tokens.SessionToken, sessionCookie.Value)
 
 	authData := AuthData{
 		SessionToken: sessionCookie,
@@ -36,6 +36,10 @@ func (suite *AuthTestSuite) TestAuth() {
 
 	assert.NoError(suite.T(), err)
 	assert.Equal(suite.T(), strconv.Itoa(userID), string(uid))
+}
+
+func (suite *AuthTestSuite) TestAuthShouldFailWithoutSessionToken() {
+	// TODO:
 }
 
 func TestAuthTestSuite(t *testing.T) {

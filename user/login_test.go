@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"testing"
 
-	tokengenerator "encore.app/internal/token_generator"
+	"encore.app/internal/tokens"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 )
@@ -94,7 +94,7 @@ func (suite *LoginTestSuite) TestShouldReturnSessionToken() {
 	sessionCookie := findCookieByName(response.Result().Cookies(), "session_token")
 	assert.NotNil(suite.T(), sessionCookie)
 
-	payload, err := tokengenerator.GetPayloadForToken(tokengenerator.SessionToken, sessionCookie.Value)
+	payload, err := tokens.GetPayloadForToken(tokens.SessionToken, sessionCookie.Value)
 	assert.NoError(suite.T(), err)
 
 	var session Session

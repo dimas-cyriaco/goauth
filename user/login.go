@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strconv"
 
-	tokengenerator "encore.app/internal/token_generator"
+	"encore.app/internal/tokens"
 )
 
 //encore:api public raw method=POST path=/login
@@ -51,7 +51,7 @@ func (s *Service) Login(response http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	sessionToken, err := tokengenerator.GenerateTokenFor(tokengenerator.SessionToken, map[string]string{
+	sessionToken, err := tokens.GenerateTokenFor(tokens.SessionToken, map[string]string{
 		"SessionID": strconv.Itoa(int(session.ID)),
 		"CSRFToken": csrfToken,
 	})
@@ -92,7 +92,7 @@ func generateCSRFToken() (string, error) {
 	rand.Read(csrfBytes)
 	csrfPayload := hex.EncodeToString(csrfBytes)
 
-	return tokengenerator.GenerateTokenFor(tokengenerator.CSRFToken, map[string]string{
+	return tokens.GenerateTokenFor(tokens.CSRFToken, map[string]string{
 		"CSRFToken": csrfPayload,
 	})
 }

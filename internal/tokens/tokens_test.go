@@ -1,4 +1,4 @@
-package tokengenerator
+package tokens
 
 import (
 	"context"
@@ -11,18 +11,18 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-type TokenGeneratorTestSuit struct {
+type TokensTestSuit struct {
 	suite.Suite
 	ctx context.Context
 }
 
-func (suite *TokenGeneratorTestSuit) SetupTest() {
+func (suite *TokensTestSuit) SetupTest() {
 	ctx := context.Background()
 
 	suite.ctx = ctx
 }
 
-func (suite *TokenGeneratorTestSuit) TestGenerateTokenFor() {
+func (suite *TokensTestSuit) TestGenerateTokenFor() {
 	// Arrange
 
 	purpose := PasswordRecovery
@@ -42,7 +42,7 @@ func (suite *TokenGeneratorTestSuit) TestGenerateTokenFor() {
 	assert.Equal(suite.T(), "{\"pur\":\"1\",\"userId\":\"123\"}", tokenString)
 }
 
-func (suite *TokenGeneratorTestSuit) TestVerifyToken() {
+func (suite *TokensTestSuit) TestVerifyToken() {
 	// Arrange
 
 	purpose := PasswordRecovery
@@ -59,7 +59,7 @@ func (suite *TokenGeneratorTestSuit) TestVerifyToken() {
 	assert.True(suite.T(), isValid)
 }
 
-func (suite *TokenGeneratorTestSuit) TestProtectsFromTampering() {
+func (suite *TokensTestSuit) TestProtectsFromTampering() {
 	// Arrange:
 	// Creates an token and extracts it's digest. Then, creates a token with a
 	// diferent payload, and extracts it's encoded payload.
@@ -88,7 +88,7 @@ func (suite *TokenGeneratorTestSuit) TestProtectsFromTampering() {
 	assert.False(suite.T(), isValid)
 }
 
-func (suite *TokenGeneratorTestSuit) TestGetPayload() {
+func (suite *TokensTestSuit) TestGetPayload() {
 	// Arrange
 
 	purpose := PasswordRecovery
@@ -106,7 +106,7 @@ func (suite *TokenGeneratorTestSuit) TestGetPayload() {
 	assert.Equal(suite.T(), payload, returnedPayload)
 }
 
-func (suite *TokenGeneratorTestSuit) TestGetPayloadValidatesPurpose() {
+func (suite *TokensTestSuit) TestGetPayloadValidatesPurpose() {
 	// Arrange
 
 	purpose := PasswordRecovery
@@ -124,6 +124,6 @@ func (suite *TokenGeneratorTestSuit) TestGetPayloadValidatesPurpose() {
 	assert.Error(suite.T(), err)
 }
 
-func TestTokenGeneratorTestSuit(t *testing.T) {
-	suite.Run(t, new(TokenGeneratorTestSuit))
+func TestTokensTestSuit(t *testing.T) {
+	suite.Run(t, new(TokensTestSuit))
 }

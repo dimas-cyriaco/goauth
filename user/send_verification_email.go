@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	tokengenerator "encore.app/internal/token_generator"
+	"encore.app/internal/tokens"
 	"encore.app/utils"
 	"encore.dev/config"
 	"encore.dev/pubsub"
@@ -103,7 +103,7 @@ func generateEmailVerificationLinkForUser(user *User) (string, error) {
 }
 
 func generateEmailVerificationTokenForUser(user *User) (string, error) {
-	purpose := tokengenerator.EmailVerification
+	purpose := tokens.EmailVerification
 	payload := map[string]string{"UserID": strconv.Itoa(int(user.ID))}
-	return tokengenerator.GenerateTokenFor(purpose, payload)
+	return tokens.GenerateTokenFor(purpose, payload)
 }
