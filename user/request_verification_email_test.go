@@ -27,7 +27,7 @@ func (suite *RequestEmailVerificationSuite) SetupTest() {
 	suite.service = service
 }
 
-func (suite *UserTestSuit) TestPublishToTopic() {
+func (suite *UserTestSuite) TestPublishToTopic() {
 	// Arrange
 
 	user := &User{}
@@ -51,7 +51,7 @@ func (suite *UserTestSuit) TestPublishToTopic() {
 	assert.Equal(suite.T(), messageCountBefore+1, len(messagesAfter))
 }
 
-func (suite *UserTestSuit) TestDoNotPublishIfAlreadyVerified() {
+func (suite *UserTestSuite) TestDoNotPublishIfAlreadyVerified() {
 	// Arrange
 
 	user := User{

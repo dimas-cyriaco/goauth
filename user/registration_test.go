@@ -11,13 +11,11 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-type UserTestSuit struct {
-	suite.Suite
-	ctx     context.Context
-	service *Service
+type RegistrationTestSuite struct {
+	UserTestSuite
 }
 
-func (suite *UserTestSuit) SetupTest() {
+func (suite *RegistrationTestSuite) SetupTest() {
 	ctx := context.Background()
 
 	// WARN: Don't work!
@@ -29,7 +27,7 @@ func (suite *UserTestSuit) SetupTest() {
 	suite.service = service
 }
 
-func (suite *UserTestSuit) TestRegistration() {
+func (suite *RegistrationTestSuite) TestRegistration() {
 	// Act
 
 	password := faker.Word()
@@ -47,7 +45,7 @@ func (suite *UserTestSuit) TestRegistration() {
 	assert.Equal(suite.T(), response.ID, user.ID)
 }
 
-func (suite *UserTestSuit) TestRegistrationValidatesPresenceOfEmail() {
+func (suite *RegistrationTestSuite) TestRegistrationValidatesPresenceOfEmail() {
 	// Arrange
 
 	password := faker.UUIDDigit()
@@ -67,7 +65,7 @@ func (suite *UserTestSuit) TestRegistrationValidatesPresenceOfEmail() {
 	assert.Equal(suite.T(), "Key: 'RegistrationParams.Email' Error:Field validation for 'Email' failed on the 'required' tag", validationError.Error())
 }
 
-func (suite *UserTestSuit) TestRegistrationValidatesFormatOfEmail() {
+func (suite *RegistrationTestSuite) TestRegistrationValidatesFormatOfEmail() {
 	// Arrange
 
 	password := faker.UUIDDigit()
@@ -88,7 +86,7 @@ func (suite *UserTestSuit) TestRegistrationValidatesFormatOfEmail() {
 	assert.Equal(suite.T(), expectedError, validationError.Error())
 }
 
-func (suite *UserTestSuit) TestRegistrationValidatesPresenceOfPassword() {
+func (suite *RegistrationTestSuite) TestRegistrationValidatesPresenceOfPassword() {
 	// Arrange
 
 	params := RegistrationParams{
@@ -108,7 +106,7 @@ func (suite *UserTestSuit) TestRegistrationValidatesPresenceOfPassword() {
 	assert.Contains(suite.T(), validationError.Error(), expectedError)
 }
 
-func (suite *UserTestSuit) TestRegistrationValidatesPresenceOfPasswordConfirmation() {
+func (suite *RegistrationTestSuite) TestRegistrationValidatesPresenceOfPasswordConfirmation() {
 	// Arrange
 
 	params := RegistrationParams{
@@ -128,7 +126,7 @@ func (suite *UserTestSuit) TestRegistrationValidatesPresenceOfPasswordConfirmati
 	assert.Contains(suite.T(), validationError.Error(), expectedError)
 }
 
-func (suite *UserTestSuit) TestRegistrationValidatesPasswordConfirmationMatch() {
+func (suite *RegistrationTestSuite) TestRegistrationValidatesPasswordConfirmationMatch() {
 	// Arrange
 
 	params := RegistrationParams{
@@ -148,7 +146,7 @@ func (suite *UserTestSuit) TestRegistrationValidatesPasswordConfirmationMatch() 
 	assert.Contains(suite.T(), validationError.Error(), expectedError)
 }
 
-func (suite *UserTestSuit) TestRegistrationHashesPassword() {
+func (suite *RegistrationTestSuite) TestRegistrationHashesPassword() {
 	// Arrange
 
 	params := RegistrationParams{}
@@ -166,7 +164,7 @@ func (suite *UserTestSuit) TestRegistrationHashesPassword() {
 	assert.NotEqual(suite.T(), params.Password, user.HashedPassword)
 }
 
-func (suite *UserTestSuit) TestRegistrationRequiresEmailToBeUnique() {
+func (suite *RegistrationTestSuite) TestRegistrationRequiresEmailToBeUnique() {
 	// Arrange
 
 	password := faker.Word()
@@ -187,7 +185,7 @@ func (suite *UserTestSuit) TestRegistrationRequiresEmailToBeUnique() {
 	assert.ErrorContains(suite.T(), err, "Invalid Argument")
 }
 
-func (suite *UserTestSuit) TestRegistrationTrimsEmailAndPassword() {
+func (suite *RegistrationTestSuite) TestRegistrationTrimsEmailAndPassword() {
 	// Arrange
 
 	password := faker.Word()
@@ -210,7 +208,7 @@ func (suite *UserTestSuit) TestRegistrationTrimsEmailAndPassword() {
 	assert.Equal(suite.T(), params.PasswordConfirmation, password)
 }
 
-func (suite *UserTestSuit) TestRegistrationPublishToTopic() {
+func (suite *RegistrationTestSuite) TestRegistrationPublishToTopic() {
 	// Arrange
 
 	password := faker.Word()
@@ -231,7 +229,7 @@ func (suite *UserTestSuit) TestRegistrationPublishToTopic() {
 	assert.Len(suite.T(), msgs, 1)
 }
 
-func (suite *UserTestSuit) TestGetUser() {
+func (suite *RegistrationTestSuite) TestGetUser() {
 	// Arrange
 
 	a := RegistrationParams{}
@@ -248,5 +246,5 @@ func (suite *UserTestSuit) TestGetUser() {
 }
 
 func TestRegistrationTestSuite(t *testing.T) {
-	suite.Run(t, new(UserTestSuit))
+	suite.Run(t, new(RegistrationTestSuite))
 }

@@ -12,6 +12,9 @@ build:
 run:
     encore run
 
+dev:
+  encore run --debug=break
+
 # Test the application
 test:
     gotestsum --raw-command -- encore test ./... -json
