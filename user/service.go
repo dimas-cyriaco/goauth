@@ -33,7 +33,11 @@ type Service struct {
 }
 
 func initService() (*Service, error) {
-	db, err := gorm.Open(postgres.New(postgres.Config{Conn: db.Stdlib()}))
+	return NewUserService(db)
+}
+
+func NewUserService(database *sqldb.Database) (*Service, error) {
+	db, err := gorm.Open(postgres.New(postgres.Config{Conn: database.Stdlib()}))
 	if err != nil {
 		return nil, err
 	}

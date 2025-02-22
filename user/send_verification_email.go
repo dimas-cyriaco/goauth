@@ -10,6 +10,7 @@ import (
 	"encore.dev/config"
 	"encore.dev/pubsub"
 	"encore.dev/rlog"
+	"encore.dev/storage/sqldb"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -44,11 +45,11 @@ var _ = pubsub.NewSubscription(
 // For dependency injection.
 func handler(ctx context.Context, event *EmailVerificationRequestedEvent) error {
 	mailer := &utils.GomailMailer{}
-	return SendVerificationEmail(ctx, event, mailer)
+	return SendVerificationEmail(ctx, event, mailer, db)
 }
 
-func SendVerificationEmail(ctx context.Context, event *EmailVerificationRequestedEvent, mailer utils.Mailer) error {
-	db, err := gorm.Open(postgres.New(postgres.Config{Conn: db.Stdlib()}))
+func SendVerificationEmail(ctx context.Context, event *EmailVerificationRequestedEvent, mailer utils.Mailer, database *sqldb.Database) error {
+	db, err := gorm.Open(postgres.New(postgres.Config{Conn: database.Stdlib()}))
 	if err != nil {
 		return err
 	}

@@ -1,28 +1,17 @@
 package user
 
 import (
-	"context"
 	"net/http"
 	"strconv"
 	"testing"
 
 	tokengenerator "encore.app/internal/token_generator"
-	"encore.app/utils"
-	"github.com/go-faker/faker/v4"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 )
 
 type LoginTestSuite struct {
 	UserTestSuite
-}
-
-func (suite *LoginTestSuite) SetupTest() {
-	service := utils.Must(initService())
-	suite.ctx = context.Background()
-	suite.service = service
-	suite.password = faker.Password()
-	suite.email = faker.Email()
 }
 
 func (suite *LoginTestSuite) TestLogin() {

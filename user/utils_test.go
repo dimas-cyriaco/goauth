@@ -7,15 +7,29 @@ import (
 	"net/http"
 	"net/http/httptest"
 
+	"encore.app/utils"
+	"encore.dev/et"
+	"encore.dev/storage/sqldb"
+	"github.com/go-faker/faker/v4"
 	"github.com/stretchr/testify/suite"
 )
 
 type UserTestSuite struct {
 	suite.Suite
 	ctx      context.Context
+	db       *sqldb.Database
 	service  *Service
 	email    string
 	password string
+}
+
+func (suite *UserTestSuite) SetupTest() {
+	suite.ctx = context.Background()
+	suite.db = utils.Must(et.NewTestDatabase(suite.ctx, "user"))
+	suite.service = utils.Must(NewUserService(suite.db))
+
+	suite.email = faker.Email()
+	suite.password = faker.Password()
 }
 
 func (suite *UserTestSuite) RegisterUser() (int, error) {

@@ -1,7 +1,6 @@
 package user
 
 import (
-	"context"
 	"testing"
 	"time"
 
@@ -13,18 +12,7 @@ import (
 )
 
 type RequestEmailVerificationSuite struct {
-	suite.Suite
-	ctx     context.Context
-	service *Service
-}
-
-func (suite *RequestEmailVerificationSuite) SetupTest() {
-	ctx := context.Background()
-
-	service := utils.Must(initService())
-
-	suite.ctx = ctx
-	suite.service = service
+	UserTestSuite
 }
 
 func (suite *UserTestSuite) TestPublishToTopic() {

@@ -1,13 +1,11 @@
 package user
 
 import (
-	"context"
 	"fmt"
 	"testing"
 
 	"encore.app/utils"
 	"encore.dev/et"
-	"github.com/go-faker/faker/v4"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
@@ -24,18 +22,7 @@ func (m *MockMailer) SendEmail(to string, subject string, body string, config *u
 }
 
 type SendVerificationEmailTestSuit struct {
-	suite.Suite
-	ctx                 context.Context
-	registrationService *Service
-}
-
-func (suite *SendVerificationEmailTestSuit) SetupTest() {
-	ctx := context.Background()
-
-	service := utils.Must(initService())
-
-	suite.ctx = ctx
-	suite.registrationService = service
+	UserTestSuite
 }
 
 func (suite *SendVerificationEmailTestSuit) TestSendVerificationEmail() {
@@ -43,16 +30,14 @@ func (suite *SendVerificationEmailTestSuit) TestSendVerificationEmail() {
 
 	et.SetCfg(mailConfig.SendEmails, true)
 
-	a := RegistrationParams{}
-	faker.FakeData(&a)
-	response := utils.Must(suite.registrationService.Registration(suite.ctx, &a))
+	userID := utils.Must(suite.RegisterUser())
 
 	mockMailer := new(MockMailer)
 
-	link := utils.Must(generateEmailVerificationLinkForUser(&User{ID: response.ID}))
+	link := utils.Must(generateEmailVerificationLinkForUser(&User{ID: userID}))
 	emailBody := fmt.Sprintf("Welcome to GOAuth. To verify your email click this link: %s", link)
 
-	mockMailer.On("SendEmail", a.Email, "Welcome to GOAuth", emailBody, &utils.MailerConfig{
+	mockMailer.On("SendEmail", suite.email, "Welcome to GOAuth", emailBody, &utils.MailerConfig{
 		SendEmailsFrom: mailConfig.SendEmailsFrom(),
 		SMTPHost:       mailConfig.SMTPHost(),
 		SMTPPort:       mailConfig.SMTPPort(),
@@ -63,8 +48,8 @@ func (suite *SendVerificationEmailTestSuit) TestSendVerificationEmail() {
 	// Act
 
 	result := SendVerificationEmail(suite.ctx, &EmailVerificationRequestedEvent{
-		UserID: response.ID,
-	}, mockMailer)
+		UserID: userID,
+	}, mockMailer, suite.db)
 
 	// Assert
 

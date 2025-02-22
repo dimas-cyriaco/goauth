@@ -1,7 +1,6 @@
 package user
 
 import (
-	"context"
 	"testing"
 
 	"encore.app/utils"
@@ -13,18 +12,6 @@ import (
 
 type RegistrationTestSuite struct {
 	UserTestSuite
-}
-
-func (suite *RegistrationTestSuite) SetupTest() {
-	ctx := context.Background()
-
-	// WARN: Don't work!
-	// et.NewTestDatabase(ctx, "user")
-
-	service := utils.Must(initService())
-
-	suite.ctx = ctx
-	suite.service = service
 }
 
 func (suite *RegistrationTestSuite) TestRegistration() {

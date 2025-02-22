@@ -8,6 +8,7 @@ import (
 	tokengenerator "encore.app/internal/token_generator"
 	"encore.dev/beta/auth"
 	"encore.dev/beta/errs"
+	"encore.dev/storage/sqldb"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -19,6 +20,10 @@ type AuthData struct {
 
 //encore:authhandler
 func AuthHandler(ctx context.Context, data *AuthData) (auth.UID, *AuthData, error) {
+	return HandleAuthentication(db, data)
+}
+
+func HandleAuthentication(database *sqldb.Database, data *AuthData) (auth.UID, *AuthData, error) {
 	sessionPayload, err := tokengenerator.GetPayloadForToken(tokengenerator.SessionToken, data.SessionToken.Value)
 	if err != nil {
 		return auth.UID(""), data, err
@@ -29,7 +34,7 @@ func AuthHandler(ctx context.Context, data *AuthData) (auth.UID, *AuthData, erro
 		return auth.UID(""), data, &errs.Error{Code: errs.Unauthenticated, Message: "Invalid CSRFToken"}
 	}
 
-	db, err := gorm.Open(postgres.New(postgres.Config{Conn: db.Stdlib()}))
+	db, err := gorm.Open(postgres.New(postgres.Config{Conn: database.Stdlib()}))
 	if err != nil {
 		return auth.UID(""), data, err
 	}
