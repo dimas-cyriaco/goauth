@@ -1,106 +1,78 @@
 package user
 
 import (
-	"context"
+	"net/http"
 	"strconv"
 	"testing"
 
-	tokengenerator "encore.app/internal/token_generator"
-	"encore.app/utils"
-	"github.com/go-faker/faker/v4"
+	"encore.app/internal/tokens"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 )
 
 type LoginTestSuite struct {
-	suite.Suite
-	ctx      context.Context
-	service  *Service
-	email    string
-	password string
-}
-
-func (suite *LoginTestSuite) SetupTest() {
-	ctx := context.Background()
-
-	service := utils.Must(initService())
-
-	suite.ctx = ctx
-	suite.service = service
-
-	suite.password = faker.Password()
-	suite.email = faker.Email()
+	UserTestSuite
 }
 
 func (suite *LoginTestSuite) TestLogin() {
+	// Arrange
+
+	suite.RegisterUser()
+
 	// Act
 
-	suite.registerUser()
-
-	// Act
-
-	_, err := suite.service.Login(suite.ctx, &LoginParams{
-		Email:    suite.email,
-		Password: suite.password,
-	})
+	response := suite.Login()
 
 	// Assert
 
-	assert.NoError(suite.T(), err)
+	assert.Equal(suite.T(), http.StatusOK, response.Code)
+	assert.NotEmpty(suite.T(), response.Result().Cookies())
 }
 
 func (suite *LoginTestSuite) TestShouldFailWithWrongPassword() {
+	// Arrange
+
+	suite.RegisterUser()
+
 	// Act
 
-	suite.registerUser()
-
-	// Act
-
-	_, err := suite.service.Login(suite.ctx, &LoginParams{
-		Email:    suite.email,
-		Password: "wrong-password",
-	})
+	response := suite.LoginWith(suite.email, "wrong-password")
 
 	// Assert
 
-	assert.Error(suite.T(), err)
-	assert.ErrorContains(suite.T(), err, "wrong email or password")
+	assert.Equal(suite.T(), http.StatusUnauthorized, response.Code)
+	assert.Contains(suite.T(), response.Body.String(), "wrong email or password")
 }
 
 func (suite *LoginTestSuite) TestShouldFailWithWrongEmail() {
+	// Arrange
+
+	suite.RegisterUser()
+
 	// Act
 
-	suite.registerUser()
-
-	// Act
-
-	_, err := suite.service.Login(suite.ctx, &LoginParams{
-		Email:    "wrong@email.com",
-		Password: suite.password,
-	})
+	response := suite.LoginWith("wrong@email.com", suite.password)
 
 	// Assert
 
-	assert.Error(suite.T(), err)
-	assert.ErrorContains(suite.T(), err, "wrong email or password")
+	assert.Equal(suite.T(), http.StatusUnauthorized, response.Code)
+	assert.Contains(suite.T(), response.Body.String(), "wrong email or password")
 }
 
 func (suite *LoginTestSuite) TestShouldCreateSession() {
-	// Act
+	// Arrange
 
-	suite.registerUser()
-
+	suite.RegisterUser()
 	var countBefore int64
 	suite.service.db.Model(&Session{}).Count(&countBefore)
 
 	// Act
 
-	utils.Must(suite.service.Login(suite.ctx, &LoginParams{
-		Email:    suite.email,
-		Password: suite.password,
-	}))
+	response := suite.Login()
 
 	// Assert
+
+	assert.Equal(suite.T(), http.StatusOK, response.Code)
 
 	var countAfter int64
 	suite.service.db.Model(&Session{}).Count(&countAfter)
@@ -109,62 +81,36 @@ func (suite *LoginTestSuite) TestShouldCreateSession() {
 }
 
 func (suite *LoginTestSuite) TestShouldReturnSessionToken() {
+	// Arrange
+
+	suite.RegisterUser()
+
 	// Act
 
-	suite.registerUser()
-
-	// Act
-
-	result := utils.Must(suite.service.Login(suite.ctx, &LoginParams{
-		Email:    suite.email,
-		Password: suite.password,
-	}))
+	response := suite.Login()
 
 	// Assert
 
-	assert.NotNil(suite.T(), result.SessionToken)
+	sessionCookie := findCookieByName(response.Result().Cookies(), "session_token")
+	assert.NotNil(suite.T(), sessionCookie)
 
-	payload, _ := tokengenerator.GetPayloadForToken(tokengenerator.SessionToken, result.SessionToken)
+	payload, err := tokens.GetPayloadForToken(tokens.SessionToken, sessionCookie.Value)
+	assert.NoError(suite.T(), err)
 
 	var session Session
 	suite.service.db.Model(&Session{}).Last(&session)
-
-	assert.Equal(suite.T(), payload["SessionID"], strconv.Itoa(session.ID))
-}
-
-func (suite *LoginTestSuite) TestShouldReturnCRSFToken() {
-	// Act
-
-	suite.registerUser()
-
-	// Act
-
-	result := utils.Must(suite.service.Login(suite.ctx, &LoginParams{
-		Email:    suite.email,
-		Password: suite.password,
-	}))
-
-	// Assert
-
-	assert.NotEmpty(suite.T(), result.CSRFToken)
-
-	sessionPayload, _ := tokengenerator.GetPayloadForToken(tokengenerator.SessionToken, result.SessionToken)
-	assert.Equal(suite.T(), result.CSRFToken, sessionPayload["CSRFToken"])
+	assert.Equal(suite.T(), payload["SessionID"], strconv.Itoa(int(session.ID)))
 }
 
 func TestLoginTestSuite(t *testing.T) {
 	suite.Run(t, new(LoginTestSuite))
 }
 
-func (suite *LoginTestSuite) registerUser() {
-	password := suite.password
-	email := suite.email
-
-	a := RegistrationParams{
-		Email:                email,
-		Password:             password,
-		PasswordConfirmation: password,
+func findCookieByName(cookies []*http.Cookie, name string) *http.Cookie {
+	for _, cookie := range cookies {
+		if cookie.Name == name {
+			return cookie
+		}
 	}
-
-	utils.Must(suite.service.Registration(suite.ctx, &a))
+	return nil
 }

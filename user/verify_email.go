@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	tokengenerator "encore.app/internal/token_generator"
+	"encore.app/internal/tokens"
 )
 
 type VerifyEmailParams struct {
@@ -13,7 +13,7 @@ type VerifyEmailParams struct {
 
 //encore:api public method=GET path=/verify_email
 func (s *Service) VerifyEmail(ctx context.Context, params *VerifyEmailParams) error {
-	payload, err := tokengenerator.GetPayloadForToken(tokengenerator.EmailVerification, params.Token)
+	payload, err := tokens.GetPayloadForToken(tokens.EmailVerification, params.Token)
 	if err != nil {
 		return err
 	}

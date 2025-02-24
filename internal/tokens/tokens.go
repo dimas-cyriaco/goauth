@@ -1,4 +1,4 @@
-package tokengenerator
+package tokens
 
 import (
 	"crypto/hmac"

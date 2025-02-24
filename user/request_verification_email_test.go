@@ -1,7 +1,6 @@
 package user
 
 import (
-	"context"
 	"testing"
 	"time"
 
@@ -13,21 +12,10 @@ import (
 )
 
 type RequestEmailVerificationSuite struct {
-	suite.Suite
-	ctx     context.Context
-	service *Service
+	UserTestSuite
 }
 
-func (suite *RequestEmailVerificationSuite) SetupTest() {
-	ctx := context.Background()
-
-	service := utils.Must(initService())
-
-	suite.ctx = ctx
-	suite.service = service
-}
-
-func (suite *UserTestSuit) TestPublishToTopic() {
+func (suite *UserTestSuite) TestPublishToTopic() {
 	// Arrange
 
 	user := &User{}
@@ -51,7 +39,7 @@ func (suite *UserTestSuit) TestPublishToTopic() {
 	assert.Equal(suite.T(), messageCountBefore+1, len(messagesAfter))
 }
 
-func (suite *UserTestSuit) TestDoNotPublishIfAlreadyVerified() {
+func (suite *UserTestSuite) TestDoNotPublishIfAlreadyVerified() {
 	// Arrange
 
 	user := User{

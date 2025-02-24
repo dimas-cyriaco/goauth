@@ -1,68 +1,90 @@
 package user
 
 import (
-	"context"
 	"crypto/rand"
 	"encoding/hex"
+	"encoding/json"
+	"net/http"
 	"strconv"
 
-	tokengenerator "encore.app/internal/token_generator"
-	"encore.dev/beta/errs"
+	"encore.app/internal/tokens"
 )
 
-// LoginParams is the request data for the Login endpoint.
-type LoginParams struct {
-	Email    string
-	Password string `encore:"sensitive"`
-}
+//encore:api public raw method=POST path=/login
+func (s *Service) Login(response http.ResponseWriter, request *http.Request) {
+	var params struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
 
-type LoginResponse struct {
-	SessionToken string `header:"Set-Cookie"`
-	CSRFToken    string `header:"X-CSRF-Token"`
-}
+	if err := json.NewDecoder(request.Body).Decode(&params); err != nil {
+		http.Error(response, "Invalid request body", http.StatusBadRequest)
+		return
+	}
 
-//encore:api public method=POST path=/login
-func (s *Service) Login(ctx context.Context, params *LoginParams) (*LoginResponse, error) {
 	var user User
-
 	err := s.db.
 		Where("email = $1", params.Email).
 		First(&user).
 		Error
 	if err != nil {
-		return nil, errs.B().Code(errs.InvalidArgument).Msg("wrong email or password").Err()
+		http.Error(response, "wrong email or password", http.StatusUnauthorized)
+		return
 	}
 
 	passwordMatches := validatePassword(user.HashedPassword, params.Password)
 	if !passwordMatches {
-		return nil, errs.B().Code(errs.InvalidArgument).Msg("wrong email or password").Err()
+		http.Error(response, "wrong email or password", http.StatusUnauthorized)
+		return
 	}
 
 	session := Session{UserID: user.ID}
 	err = s.db.Create(&session).Error
 	if err != nil {
-		return nil, errs.B().Code(errs.InvalidArgument).Msg("wrong email or password").Err()
+		http.Error(response, "wrong email or password", http.StatusUnauthorized)
+		return
 	}
 
 	csrfToken, err := generateCSRFToken()
 	if err != nil {
-		return nil, err
+		http.Error(response, "Internal server error", http.StatusInternalServerError)
+		return
 	}
 
-	token, err := tokengenerator.GenerateTokenFor(tokengenerator.SessionToken, map[string]string{
+	sessionToken, err := tokens.GenerateTokenFor(tokens.SessionToken, map[string]string{
 		"SessionID": strconv.Itoa(int(session.ID)),
 		"CSRFToken": csrfToken,
 	})
 	if err != nil {
-		return nil, err
+		http.Error(response, "Internal server error", http.StatusInternalServerError)
+		return
 	}
 
-	response := LoginResponse{
-		SessionToken: token,
-		CSRFToken:    csrfToken,
-	}
+	// Set the session cookie
+	http.SetCookie(response, &http.Cookie{
+		Name:     "session_token",
+		Value:    sessionToken,
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteStrictMode,
+	})
 
-	return &response, nil
+	// Set the csrf token cookie
+	http.SetCookie(response, &http.Cookie{
+		Name:     "csrf_token",
+		Value:    csrfToken,
+		Path:     "/",
+		HttpOnly: false,
+		Secure:   true,
+		SameSite: http.SameSiteStrictMode,
+	})
+
+	// Return success response
+	response.WriteHeader(http.StatusOK)
+	json.NewEncoder(response).Encode(map[string]string{
+		"status": "success",
+	})
 }
 
 func generateCSRFToken() (string, error) {
@@ -70,7 +92,7 @@ func generateCSRFToken() (string, error) {
 	rand.Read(csrfBytes)
 	csrfPayload := hex.EncodeToString(csrfBytes)
 
-	return tokengenerator.GenerateTokenFor(tokengenerator.CSRFToken, map[string]string{
+	return tokens.GenerateTokenFor(tokens.CSRFToken, map[string]string{
 		"CSRFToken": csrfPayload,
 	})
 }
