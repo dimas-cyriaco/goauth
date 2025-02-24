@@ -17,8 +17,8 @@ dev:
 
 # Test the application
 test:
-    gotestsum --raw-command -- encore test ./... -json --debug
+    gotestsum --raw-command -- encore test ./... -json
 
 # Test the application
 test-watch:
-    gotestsum --watch --raw-command -- encore test ./... -json --debug
+    gotestsum --watch --raw-command -- encore test ./... -json
