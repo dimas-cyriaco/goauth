@@ -18,6 +18,7 @@ type AuthData struct {
 	CSRFToken    string       `header:"X-CSRF-Token"`
 }
 
+//encore:authhandler
 func AuthHandler(ctx context.Context, data *AuthData) (auth.UID, *AuthData, error) {
 	return HandleAuthentication(db, data)
 }
