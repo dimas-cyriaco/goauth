@@ -1,6 +1,6 @@
 # GOAuth
 
-An experimental, self-hostable, OAuth 2 server.
+An experimental OAuth 2.0 server made for learning Go, Encore, and the intricacies of OAuth.
 
 ## ⚡️ Requirements
 
