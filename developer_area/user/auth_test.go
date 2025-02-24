@@ -15,7 +15,7 @@ type AuthTestSuite struct {
 }
 
 func (suite *AuthTestSuite) TestAuth() {
-	// Act
+	// Arrange
 
 	userID := utils.Must(suite.RegisterUser())
 
@@ -39,7 +39,7 @@ func (suite *AuthTestSuite) TestAuth() {
 }
 
 func (suite *AuthTestSuite) TestAuthShouldFailWithoutSessionToken() {
-	// Act
+	// Arrange
 
 	utils.Must(suite.RegisterUser())
 
@@ -63,7 +63,7 @@ func (suite *AuthTestSuite) TestAuthShouldFailWithoutSessionToken() {
 }
 
 func (suite *AuthTestSuite) TestAuthShouldFailWithoutCSRFToken() {
-	// Act
+	// Arrange
 
 	utils.Must(suite.RegisterUser())
 
@@ -86,7 +86,7 @@ func (suite *AuthTestSuite) TestAuthShouldFailWithoutCSRFToken() {
 }
 
 // func (suite *AuthTestSuite) TestAuthShouldFailWithInvalidSessionToken() {
-// 	// Act
+// 	// Arrange
 //
 // 	utils.Must(suite.RegisterUser())
 //
