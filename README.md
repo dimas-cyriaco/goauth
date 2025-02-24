@@ -20,6 +20,16 @@ just test
 just test-watch
 ```
 
+## Systems
+
+### [WIP] Developer Area
+
+This is where the developers create/manage their apps
+
+### [TODO] OAuth Flows
+
+### TODO Backoffice
+
 ## Debugging
 
-https://encore.dev/docs/go/how-to/debug
+<https://encore.dev/docs/go/how-to/debug>
