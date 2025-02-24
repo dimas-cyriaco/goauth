@@ -13,7 +13,7 @@ run:
     encore run
 
 dev:
-  encore run --debug=break
+    encore run --debug=break
 
 # Test the application
 test:

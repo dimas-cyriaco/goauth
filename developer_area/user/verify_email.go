@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"encore.app/internal/tokens"
+	"encore.app/developer_area/internal/tokens"
 )
 
 type VerifyEmailParams struct {

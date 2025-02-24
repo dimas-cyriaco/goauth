@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	"encore.app/utils"
+	"encore.app/developer_area/utils"
 	"encore.dev/et"
 	"encore.dev/storage/sqldb"
 	"github.com/go-faker/faker/v4"

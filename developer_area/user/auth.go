@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"encore.app/internal/tokens"
+	"encore.app/developer_area/internal/tokens"
 	"encore.dev/beta/auth"
 	"encore.dev/beta/errs"
 	"encore.dev/storage/sqldb"
@@ -18,7 +18,6 @@ type AuthData struct {
 	CSRFToken    string       `header:"X-CSRF-Token"`
 }
 
-//encore:authhandler
 func AuthHandler(ctx context.Context, data *AuthData) (auth.UID, *AuthData, error) {
 	return HandleAuthentication(db, data)
 }

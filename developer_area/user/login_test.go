@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"testing"
 
-	"encore.app/internal/tokens"
+	"encore.app/developer_area/internal/tokens"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 )

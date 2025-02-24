@@ -3,7 +3,7 @@ package user
 import (
 	"testing"
 
-	"encore.app/utils"
+	"encore.app/developer_area/utils"
 	"encore.dev/et"
 	"github.com/go-faker/faker/v4"
 	"github.com/stretchr/testify/assert"

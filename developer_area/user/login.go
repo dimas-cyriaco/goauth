@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"encore.app/internal/tokens"
+	"encore.app/developer_area/internal/tokens"
 )
 
 //encore:api public raw method=POST path=/login
