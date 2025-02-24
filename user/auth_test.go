@@ -39,7 +39,76 @@ func (suite *AuthTestSuite) TestAuth() {
 }
 
 func (suite *AuthTestSuite) TestAuthShouldFailWithoutSessionToken() {
-	// TODO:
+	// Act
+
+	utils.Must(suite.RegisterUser())
+
+	response := suite.Login()
+	sessionCookie := findCookieByName(response.Result().Cookies(), "session_token")
+	payload, _ := tokens.GetPayloadForToken(tokens.SessionToken, sessionCookie.Value)
+
+	authData := AuthData{
+		SessionToken: nil,
+		CSRFToken:    payload["CSRFToken"],
+	}
+
+	// Act
+
+	_, _, err := HandleAuthentication(suite.db, &authData)
+
+	// Assert
+
+	assert.Error(suite.T(), err)
+	assert.ErrorContains(suite.T(), err, "unauthenticated")
+}
+
+func (suite *AuthTestSuite) TestAuthShouldFailWithoutCSRFToken() {
+	// Act
+
+	utils.Must(suite.RegisterUser())
+
+	response := suite.Login()
+	sessionCookie := findCookieByName(response.Result().Cookies(), "session_token")
+
+	authData := AuthData{
+		SessionToken: sessionCookie,
+		CSRFToken:    "",
+	}
+
+	// Act
+
+	_, _, err := HandleAuthentication(suite.db, &authData)
+
+	// Assert
+
+	assert.Error(suite.T(), err)
+	assert.ErrorContains(suite.T(), err, "unauthenticated")
+}
+
+func (suite *AuthTestSuite) TestAuthShouldFailWithInvalidSessionToken() {
+	// Act
+
+	utils.Must(suite.RegisterUser())
+
+	response := suite.Login()
+	sessionCookie := findCookieByName(response.Result().Cookies(), "session_token")
+	payload, _ := tokens.GetPayloadForToken(tokens.SessionToken, sessionCookie.Value)
+
+	// TODO: Tamper with the session token payload.
+
+	authData := AuthData{
+		SessionToken: sessionCookie,
+		CSRFToken:    payload["CSRFToken"],
+	}
+
+	// Act
+
+	_, _, err := HandleAuthentication(suite.db, &authData)
+
+	// Assert
+
+	assert.Error(suite.T(), err)
+	assert.ErrorContains(suite.T(), err, "unauthenticated")
 }
 
 func TestAuthTestSuite(t *testing.T) {

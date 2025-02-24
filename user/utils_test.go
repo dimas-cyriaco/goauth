@@ -32,21 +32,29 @@ func (suite *UserTestSuite) SetupTest() {
 	suite.password = faker.Password()
 }
 
+// RegisterUser creates a new user account using the suite's default credentials.
+//
+// It uses the default suite email and password to register a new user.
 func (suite *UserTestSuite) RegisterUser() (int, error) {
-	a := RegistrationParams{
+	params := RegistrationParams{
 		Email:                suite.email,
 		Password:             suite.password,
 		PasswordConfirmation: suite.password,
 	}
 
-	response, err := suite.service.Registration(suite.ctx, &a)
+	response, err := suite.service.Registration(suite.ctx, &params)
 	return response.ID, err
 }
 
+// Login performs a login request using the suite's default credentials.
+//
+// To use different credentials, use the `(suite *UserTestSuite) LoginWith(email, password string)` method.
 func (suite *UserTestSuite) Login() *httptest.ResponseRecorder {
 	return suite.LoginWith(suite.email, suite.password)
 }
 
+// LoginWith performs a login request with the specified credentials.
+// It creates and executes an HTTP POST request to the /login endpoint with the given email and password.
 func (suite *UserTestSuite) LoginWith(email, password string) *httptest.ResponseRecorder {
 	loginData := map[string]string{
 		"email":    email,

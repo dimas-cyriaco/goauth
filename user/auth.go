@@ -24,6 +24,10 @@ func AuthHandler(ctx context.Context, data *AuthData) (auth.UID, *AuthData, erro
 }
 
 func HandleAuthentication(database *sqldb.Database, data *AuthData) (auth.UID, *AuthData, error) {
+	if data.SessionToken == nil || data.CSRFToken == "" {
+		return auth.UID(""), data, &errs.Error{Code: errs.Unauthenticated, Message: "Invalid SessionToken or CSRFToken"}
+	}
+
 	sessionPayload, err := tokens.GetPayloadForToken(tokens.SessionToken, data.SessionToken.Value)
 	if err != nil {
 		return auth.UID(""), data, err
@@ -34,7 +38,7 @@ func HandleAuthentication(database *sqldb.Database, data *AuthData) (auth.UID, *
 		return auth.UID(""), data, &errs.Error{Code: errs.Unauthenticated, Message: "Invalid CSRFToken"}
 	}
 
-	db, err := gorm.Open(postgres.New(postgres.Config{Conn: database.Stdlib()}))
+	gorm, err := gorm.Open(postgres.New(postgres.Config{Conn: database.Stdlib()}))
 	if err != nil {
 		return auth.UID(""), data, err
 	}
@@ -42,7 +46,7 @@ func HandleAuthentication(database *sqldb.Database, data *AuthData) (auth.UID, *
 	sessionID := sessionPayload["SessionID"]
 
 	var session Session
-	err = db.Where("id = $1", sessionID).First(&session).Error
+	err = gorm.Where("id = $1", sessionID).First(&session).Error
 	if err != nil {
 		return auth.UID(strconv.Itoa(session.ID)), data, err
 	}
