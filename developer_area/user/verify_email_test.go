@@ -17,9 +17,9 @@ func (suite *VerifyEmailTestSuit) TestVerifyEmail() {
 
 	userID := utils.Must(suite.RegisterUser())
 
-	fromDB := utils.Must(suite.service.Get(suite.ctx, userID))
+	user := utils.Must(suite.findUserByID(userID))
 
-	assert.Nil(suite.T(), fromDB.EmailVerifiedAt)
+	assert.Nil(suite.T(), user.EmailVerifiedAt)
 
 	token := utils.Must(generateEmailVerificationTokenForUser(&User{
 		ID: userID,
@@ -34,9 +34,9 @@ func (suite *VerifyEmailTestSuit) TestVerifyEmail() {
 
 	assert.NoError(suite.T(), err)
 
-	fromDB = utils.Must(suite.service.Get(suite.ctx, userID))
+	user = utils.Must(suite.findUserByID(userID))
 
-	assert.NotNil(suite.T(), fromDB.EmailVerifiedAt)
+	assert.NotNil(suite.T(), user.EmailVerifiedAt)
 }
 
 func TestVerifyEmailTestSuite(t *testing.T) {
