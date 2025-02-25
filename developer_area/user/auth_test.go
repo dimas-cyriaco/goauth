@@ -85,32 +85,6 @@ func (suite *AuthTestSuite) TestAuthShouldFailWithoutCSRFToken() {
 	assert.ErrorContains(suite.T(), err, "unauthenticated")
 }
 
-// func (suite *AuthTestSuite) TestAuthShouldFailWithInvalidSessionToken() {
-// 	// Arrange
-//
-// 	utils.Must(suite.RegisterUser())
-//
-// 	response := suite.Login()
-// 	sessionCookie := findCookieByName(response.Result().Cookies(), "session_token")
-// 	payload, _ := tokens.GetPayloadForToken(tokens.SessionToken, sessionCookie.Value)
-//
-// 	// TODO: Tamper with the session token payload.
-//
-// 	authData := AuthData{
-// 		SessionToken: sessionCookie,
-// 		CSRFToken:    payload["CSRFToken"],
-// 	}
-//
-// 	// Act
-//
-// 	_, _, err := HandleAuthentication(suite.db, &authData)
-//
-// 	// Assert
-//
-// 	assert.Error(suite.T(), err)
-// 	assert.ErrorContains(suite.T(), err, "unauthenticated")
-// }
-
 func TestAuthTestSuite(t *testing.T) {
 	suite.Run(t, new(AuthTestSuite))
 }

@@ -26,7 +26,8 @@ func (suite *RegistrationTestSuite) TestRegistration() {
 
 	// Assert
 
-	user, _ := suite.service.Get(suite.ctx, response.ID)
+	user := utils.Must(suite.findUserByID(response.ID))
+
 	assert.NotNil(suite.T(), response)
 	assert.NotNil(suite.T(), user)
 	assert.Equal(suite.T(), response.ID, user.ID)
@@ -145,7 +146,7 @@ func (suite *RegistrationTestSuite) TestRegistrationHashesPassword() {
 
 	// Assert
 
-	user, _ := suite.service.Get(suite.ctx, response.ID)
+	user := utils.Must(suite.findUserByID(response.ID))
 
 	assert.NotEmpty(suite.T(), user.HashedPassword)
 	assert.NotEqual(suite.T(), params.Password, user.HashedPassword)
@@ -214,22 +215,6 @@ func (suite *RegistrationTestSuite) TestRegistrationPublishToTopic() {
 	// Get all published messages on the EmailVerificationRequested topic from this test.
 	msgs := et.Topic(EmailVerificationRequested).PublishedMessages()
 	assert.Len(suite.T(), msgs, 1)
-}
-
-func (suite *RegistrationTestSuite) TestGetUser() {
-	// Arrange
-
-	a := RegistrationParams{}
-	faker.FakeData(&a)
-	response := utils.Must(suite.service.Registration(suite.ctx, &a))
-
-	// Act
-
-	user := utils.Must(suite.service.Get(suite.ctx, response.ID))
-
-	// Assert
-
-	assert.Equal(suite.T(), user.Email, a.Email)
 }
 
 func TestRegistrationTestSuite(t *testing.T) {

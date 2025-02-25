@@ -72,3 +72,13 @@ func (suite *UserTestSuite) LoginWith(email, password string) *httptest.Response
 
 	return response
 }
+
+func (suite *UserTestSuite) findUserByID(userID int) (*User, error) {
+	var user User
+	err := suite.service.db.Model(&User{}).Where("id = $1", userID).First(&user).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}
