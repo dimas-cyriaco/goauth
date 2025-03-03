@@ -1,0 +1,51 @@
+name: Frontend
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: "pnpm"
+          cache-dependency-path: "./developer_area/frontend/pnpm-lock.yaml"
+
+      - name: Install frontend dependencies
+        working-directory: ./developer_area/frontend
+        run: pnpm install
+
+      - name: Install playwright browsers
+        working-directory: ./developer_area/frontend
+        run: pnpm exec playwright install --with-deps
+
+      - name: Download Encore CLI script
+        uses: sozo-design/curl@v1.0.2
+        with:
+          args: --output install.sh -L https://encore.dev/install.sh
+
+      - name: Install Encore CLI
+        run: bash install.sh
+
+      - name: Log in to Encore
+        run: |
+          /home/runner/.encore/bin/encore auth login --auth-key="${{ secrets.ENCORE_AUTH_KEY }}"
+
+      - name: Start Encore
+        run: /home/runner/.encore/bin/encore run --port=4001
+
+      - name: Run Tests
+        working-directory: ./developer_area/frontend
+        run: pnpm exec playwright test
