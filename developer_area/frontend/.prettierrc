@@ -1,0 +1,16 @@
+{
+  "experimentalTernaries": true,
+  "importOrder": [
+    "^@core/(.*)$",
+    "<THIRD_PARTY_MODULES>",
+    "^@server/(.*)$",
+    "^@ui/(.*)$",
+    "^[./]"
+  ],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true,
+  "semi": false,
+  "singleAttributePerLine": true,
+  "singleQuote": true,
+  "plugins": ["@trivago/prettier-plugin-sort-imports"]
+}

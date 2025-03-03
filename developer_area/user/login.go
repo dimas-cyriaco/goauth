@@ -12,19 +12,12 @@ import (
 
 //encore:api public raw method=POST path=/login
 func (s *Service) Login(response http.ResponseWriter, request *http.Request) {
-	var params struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
-	}
-
-	if err := json.NewDecoder(request.Body).Decode(&params); err != nil {
-		http.Error(response, "Invalid request body", http.StatusBadRequest)
-		return
-	}
+	email := request.FormValue("email")
+	password := request.FormValue("password")
 
 	var user User
 	err := s.db.
-		Where("email = $1", params.Email).
+		Where("email = $1", email).
 		First(&user).
 		Error
 	if err != nil {
@@ -32,7 +25,7 @@ func (s *Service) Login(response http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	passwordMatches := validatePassword(user.HashedPassword, params.Password)
+	passwordMatches := validatePassword(user.HashedPassword, password)
 	if !passwordMatches {
 		http.Error(response, "wrong email or password", http.StatusUnauthorized)
 		return

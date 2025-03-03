@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"encore.app/developer_area/utils"
 	"encore.dev/beta/errs"
 	"encore.dev/rlog"
 	"github.com/go-playground/mold/v4/modifiers"
@@ -13,9 +14,10 @@ import (
 )
 
 type RegistrationParams struct {
-	Email                string `mod:"trim" validate:"required,email" encore:"sensitive"`
-	Password             string `mod:"trim" validate:"required,min=6,max=72" encore:"sensitive"`
-	PasswordConfirmation string `mod:"trim" validate:"required,eqcsfield=Password" encore:"sensitive"`
+	Email                string `mod:"trim" validate:"required,email" encore:"sensitive" json:"email"`
+	Password             string `mod:"trim" validate:"required,min=6,max=72" encore:"sensitive" json:"password"`
+	PasswordConfirmation string `mod:"trim" validate:"required,eqcsfield=Password" encore:"sensitive" json:"password_confirmation"`
+	// TODO: Get language from headers
 }
 
 type RegistrationResponse struct {
@@ -23,6 +25,8 @@ type RegistrationResponse struct {
 }
 
 func (params *RegistrationParams) Validate() error {
+	eb := errs.B().Code(errs.InvalidArgument)
+
 	validate := validator.New()
 	conform := modifiers.New()
 
@@ -31,7 +35,16 @@ func (params *RegistrationParams) Validate() error {
 		return err
 	}
 
-	return validate.Struct(params)
+	err = validate.Struct(params)
+	if err != nil {
+		details := utils.GetValidationErrorDetails(validate, err)
+
+		eb.Msg("Validation error").Details(&details)
+
+		return eb.Err()
+	}
+
+	return err
 }
 
 //encore:api public method=POST path=/sign_up
@@ -51,7 +64,10 @@ func (s *Service) Registration(ctx context.Context, params *RegistrationParams) 
 	if err != nil {
 		var pgError *pgconn.PgError
 		if errors.As(err, &pgError) && pgError.Code == "23505" {
-			return nil, &errs.Error{Code: errs.InvalidArgument, Message: "Invalid Argument"}
+			details := &utils.ValidationErrors{
+				"email": {"Email already taken"},
+			}
+			return nil, &errs.Error{Code: errs.InvalidArgument, Message: "", Details: details}
 		}
 
 		rlog.Error("Database error creating new User.", "err", err)
@@ -77,6 +93,9 @@ func hashPassword(password string) (string, error) {
 }
 
 func validatePassword(hashedPassword string, password string) bool {
+	rlog.Debug("hashedPassword", "hashedPassword", hashedPassword)
+	rlog.Debug("password", "password", password)
 	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
+	rlog.Error("wrong email or password", "err", err)
 	return err == nil
 }

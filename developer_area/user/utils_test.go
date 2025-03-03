@@ -1,15 +1,16 @@
 package user
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
+	"strings"
 
 	"encore.app/developer_area/utils"
 	"encore.dev/et"
 	"encore.dev/storage/sqldb"
+	"github.com/charmbracelet/log"
 	"github.com/go-faker/faker/v4"
 	"github.com/stretchr/testify/suite"
 )
@@ -36,6 +37,8 @@ func (suite *UserTestSuite) SetupTest() {
 //
 // It uses the default suite email and password to register a new user.
 func (suite *UserTestSuite) RegisterUser() (int, error) {
+	log.Infof("🪵 suite.email: %v\n", suite.email)
+	log.Infof("🪵 suite.password: %v\n", suite.password)
 	params := RegistrationParams{
 		Email:                suite.email,
 		Password:             suite.password,
@@ -50,21 +53,23 @@ func (suite *UserTestSuite) RegisterUser() (int, error) {
 //
 // To use different credentials, use the `(suite *UserTestSuite) LoginWith(email, password string)` method.
 func (suite *UserTestSuite) Login() *httptest.ResponseRecorder {
+	log.Infof("🪵 suite.email: %v\n", suite.email)
+	log.Infof("🪵 suite.password: %v\n", suite.password)
 	return suite.LoginWith(suite.email, suite.password)
 }
 
 // LoginWith performs a login request with the specified credentials.
 // It creates and executes an HTTP POST request to the /login endpoint with the given email and password.
 func (suite *UserTestSuite) LoginWith(email, password string) *httptest.ResponseRecorder {
-	loginData := map[string]string{
-		"email":    email,
-		"password": password,
+	loginData := url.Values{
+		"email":    []string{email},
+		"password": []string{password},
 	}
 
-	body, _ := json.Marshal(loginData)
+	loginForm := strings.NewReader(loginData.Encode())
 
-	request := httptest.NewRequest(http.MethodPost, "/login", bytes.NewBuffer(body))
-	request.Header.Set("Content-Type", "application/json")
+	request := httptest.NewRequest(http.MethodPost, "/login", loginForm)
+	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
 	response := httptest.NewRecorder()
 
