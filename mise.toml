@@ -1,0 +1,55 @@
+[tools]
+act = "0.2.75"
+go = "1.24.0"
+gotestsum = "1.12.0"
+node = "23.9.0"
+pnpm = "10.5.2"
+usage = "2.0.5"
+
+[tasks."build:backend"]
+description = "Build Backend Docker images"
+run = "encore build docker goauth"
+
+[tasks."test:backend"]
+description = "Run Backend tests"
+run = "gotestsum --raw-command -- encore test ./... -json"
+
+[tasks."test:watch:backend"]
+description = "Run Backend tests in watch mode"
+run = "gotestsum --watch --raw-command -- encore test ./... -json"
+
+[tasks."ci:push"]
+description = "Simulate a push on the CI"
+run = "act --var VITE_ENCORE_ENVIRONMENT=local --var ACTIONS_RUNTIME_TOKEN=foobar -s ENCORE_AUTH_KEY=$(echo $ENCORE_AUTH_KEY) push"
+
+[tasks."ci:push:frontend"]
+description = "Simulate a push on the CI (Frontend)"
+run = "act --var VITE_ENCORE_ENVIRONMENT=local --var ACTIONS_RUNTIME_TOKEN=foobar -s ENCORE_AUTH_KEY=$(echo $ENCORE_AUTH_KEY) -W .github/workflows/frontend.yaml push"
+
+[tasks."ci:push:backend"]
+description = "Simulate a push on the CI (Backend)"
+run = "act --var VITE_ENCORE_ENVIRONMENT=local --var ACTIONS_RUNTIME_TOKEN=foobar -s ENCORE_AUTH_KEY=$(echo $ENCORE_AUTH_KEY) -W .github/workflows/backend.yaml push"
+
+[tasks."pc:up"]
+description = "Start all the services with Process Compose"
+run = "process-compose up -D"
+
+[tasks."pc:down"]
+description = "Stop all Process Compose services"
+run = "process-compose down"
+
+[tasks."pc:ui"]
+description = "Show Process Compose UI"
+run = "process-compose attach"
+
+[tasks."pc:logs:backend"]
+description = "Show Process Compose Backend logs"
+run = "process-compose process logs test-backend -f"
+
+[tasks."run:backend"]
+description = "Run Backend"
+run = "encore run --debug=break"
+
+[tasks."run:frontend"]
+description = "Run Frontend"
+run = "pnpm --prefix developer_area/frontend dev"

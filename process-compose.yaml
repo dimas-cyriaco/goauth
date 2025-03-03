@@ -1,0 +1,52 @@
+version: "0.5"
+
+processes:
+  backend:
+    command: encore run
+    availability:
+      restart: "always"
+    readiness_probe:
+      http_get:
+        host: 127.0.0.1
+        scheme: http
+        path: "/health"
+        port: 4000
+      period_seconds: 300
+    liveness_probe:
+      http_get:
+        host: 127.0.0.1
+        scheme: http
+        path: "/health"
+        port: 4000
+      period_seconds: 300
+
+  frontend:
+    command: pnpm --prefix developer_area/frontend dev
+    availability:
+      restart: "always"
+    readiness_probe:
+      http_get:
+        host: localhost
+        scheme: http
+        path: "/signup"
+        port: 5173
+      period_seconds: 300
+    liveness_probe:
+      http_get:
+        host: localhost
+        scheme: http
+        path: "/signup"
+        port: 5173
+      period_seconds: 300
+    depends_on:
+      backend:
+        condition: process_healthy
+
+  test-backend:
+    command: gotestsum --watch --raw-command -- encore test ./... -json
+
+  test-frontend:
+    command: pnpm --prefix developer_area/frontend exec playwright test --ui
+    depends_on:
+      frontend:
+        condition: process_healthy
