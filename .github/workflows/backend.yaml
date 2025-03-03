@@ -7,7 +7,7 @@ on:
     branches: ["main"]
 
 jobs:
-  test:
+  Test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -24,5 +24,5 @@ jobs:
         run: |
           /home/runner/.encore/bin/encore auth login --auth-key="${{ secrets.ENCORE_AUTH_KEY }}"
 
-      - name: Test
+      - name: Run tests
         run: /home/runner/.encore/bin/encore test ./...

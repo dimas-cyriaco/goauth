@@ -7,4 +7,5 @@ todo.md
 hurl/local.env
 .idea/
 .cursorrules
-go.planning.avanterules
+.aider*
+developer_area/frontend/.env
