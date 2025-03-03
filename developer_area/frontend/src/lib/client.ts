@@ -73,6 +73,10 @@ export namespace user {
         CSRFToken: string
     }
 
+    export interface HealthResponse {
+        success: boolean
+    }
+
     export interface MeResponse {
         id: number
         email: string
@@ -104,6 +108,12 @@ export namespace user {
 
         constructor(baseClient: BaseClient) {
             this.baseClient = baseClient
+        }
+
+        public async Health(): Promise<HealthResponse> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI("GET", `/health`)
+            return await resp.json() as HealthResponse
         }
 
         public async Login(method: "POST", body?: BodyInit, options?: CallParameters): Promise<globalThis.Response> {
