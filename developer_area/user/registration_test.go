@@ -4,17 +4,18 @@ import (
 	"testing"
 
 	"encore.app/developer_area/utils"
+	"encore.dev/beta/errs"
 	"encore.dev/et"
 	"github.com/go-faker/faker/v4"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 )
 
-type RegistrationTestSuite struct {
+type RSuite struct {
 	UserTestSuite
 }
 
-func (suite *RegistrationTestSuite) TestRegistration() {
+func (suite *RSuite) TestCreatesUser() {
 	// Act
 
 	password := faker.Word()
@@ -33,7 +34,7 @@ func (suite *RegistrationTestSuite) TestRegistration() {
 	assert.Equal(suite.T(), response.ID, user.ID)
 }
 
-func (suite *RegistrationTestSuite) TestRegistrationValidatesPresenceOfEmail() {
+func (suite *RSuite) TestValidatesPresenceOfEmail() {
 	// Arrange
 
 	password := faker.UUIDDigit()
@@ -50,10 +51,15 @@ func (suite *RegistrationTestSuite) TestRegistrationValidatesPresenceOfEmail() {
 	// Assert
 
 	assert.NotNil(suite.T(), validationError)
-	assert.Equal(suite.T(), "Key: 'RegistrationParams.Email' Error:Field validation for 'Email' failed on the 'required' tag", validationError.Error())
+
+	expected := &utils.ValidationErrors{
+		"email": {"Email is a required field"},
+	}
+
+	assert.Equal(suite.T(), expected, validationError.(*errs.Error).Details)
 }
 
-func (suite *RegistrationTestSuite) TestRegistrationValidatesFormatOfEmail() {
+func (suite *RSuite) TestValidatesFormatOfEmail() {
 	// Arrange
 
 	password := faker.UUIDDigit()
@@ -70,11 +76,17 @@ func (suite *RegistrationTestSuite) TestRegistrationValidatesFormatOfEmail() {
 	// Assert
 
 	assert.NotNil(suite.T(), validationError)
-	expectedError := "Key: 'RegistrationParams.Email' Error:Field validation for 'Email' failed on the 'email' tag"
-	assert.Equal(suite.T(), expectedError, validationError.Error())
+
+	errors := validationError.(*errs.Error)
+
+	expected := &utils.ValidationErrors{
+		"email": {"Email must be a valid email address"},
+	}
+
+	assert.Equal(suite.T(), expected, errors.Details)
 }
 
-func (suite *RegistrationTestSuite) TestRegistrationValidatesPresenceOfPassword() {
+func (suite *RSuite) TestValidatesPresenceOfPassword() {
 	// Arrange
 
 	params := RegistrationParams{
@@ -90,11 +102,18 @@ func (suite *RegistrationTestSuite) TestRegistrationValidatesPresenceOfPassword(
 	// Assert
 
 	assert.NotNil(suite.T(), validationError)
-	expectedError := "Key: 'RegistrationParams.Password' Error:Field validation for 'Password' failed on the 'required' tag"
-	assert.Contains(suite.T(), validationError.Error(), expectedError)
+
+	errors := validationError.(*errs.Error)
+
+	expected := &utils.ValidationErrors{
+		"password":              {"Password is a required field"},
+		"password_confirmation": {"PasswordConfirmation must be equal to Password"},
+	}
+
+	assert.Equal(suite.T(), expected, errors.Details)
 }
 
-func (suite *RegistrationTestSuite) TestRegistrationValidatesPresenceOfPasswordConfirmation() {
+func (suite *RSuite) TestValidatesPresenceOfPasswordConfirmation() {
 	// Arrange
 
 	params := RegistrationParams{
@@ -110,11 +129,17 @@ func (suite *RegistrationTestSuite) TestRegistrationValidatesPresenceOfPasswordC
 	// Assert
 
 	assert.NotNil(suite.T(), validationError)
-	expectedError := "Key: 'RegistrationParams.PasswordConfirmation' Error:Field validation for 'PasswordConfirmation' failed on the 'required' tag"
-	assert.Contains(suite.T(), validationError.Error(), expectedError)
+
+	errors := validationError.(*errs.Error)
+
+	expected := &utils.ValidationErrors{
+		"password_confirmation": {"PasswordConfirmation is a required field"},
+	}
+
+	assert.Equal(suite.T(), expected, errors.Details)
 }
 
-func (suite *RegistrationTestSuite) TestRegistrationValidatesPasswordConfirmationMatch() {
+func (suite *RSuite) TestValidatesPasswordConfirmationMatch() {
 	// Arrange
 
 	params := RegistrationParams{
@@ -130,11 +155,17 @@ func (suite *RegistrationTestSuite) TestRegistrationValidatesPasswordConfirmatio
 	// Assert
 
 	assert.NotNil(suite.T(), validationError)
-	expectedError := "Key: 'RegistrationParams.PasswordConfirmation' Error:Field validation for 'PasswordConfirmation' failed on the 'eqcsfield' tag"
-	assert.Contains(suite.T(), validationError.Error(), expectedError)
+
+	errors := validationError.(*errs.Error)
+
+	expected := &utils.ValidationErrors{
+		"password_confirmation": {"PasswordConfirmation must be equal to Password"},
+	}
+
+	assert.Equal(suite.T(), expected, errors.Details)
 }
 
-func (suite *RegistrationTestSuite) TestRegistrationHashesPassword() {
+func (suite *RSuite) TestHashesPassword() {
 	// Arrange
 
 	params := RegistrationParams{}
@@ -152,7 +183,7 @@ func (suite *RegistrationTestSuite) TestRegistrationHashesPassword() {
 	assert.NotEqual(suite.T(), params.Password, user.HashedPassword)
 }
 
-func (suite *RegistrationTestSuite) TestRegistrationRequiresEmailToBeUnique() {
+func (suite *RSuite) TestRequiresEmailToBeUnique() {
 	// Arrange
 
 	password := faker.Word()
@@ -170,10 +201,15 @@ func (suite *RegistrationTestSuite) TestRegistrationRequiresEmailToBeUnique() {
 	// Assert
 
 	assert.NotNil(suite.T(), err)
-	assert.ErrorContains(suite.T(), err, "Invalid Argument")
+
+	errors := err.(*errs.Error)
+
+	expected := &utils.ValidationErrors{"email": {"Email already taken"}}
+
+	assert.Equal(suite.T(), expected, errors.Details)
 }
 
-func (suite *RegistrationTestSuite) TestRegistrationTrimsEmailAndPassword() {
+func (suite *RSuite) TestTrimsEmailAndPassword() {
 	// Arrange
 
 	password := faker.Word()
@@ -196,7 +232,7 @@ func (suite *RegistrationTestSuite) TestRegistrationTrimsEmailAndPassword() {
 	assert.Equal(suite.T(), params.PasswordConfirmation, password)
 }
 
-func (suite *RegistrationTestSuite) TestRegistrationPublishToTopic() {
+func (suite *RSuite) TestPublishToTopic() {
 	// Arrange
 
 	password := faker.Word()
@@ -218,5 +254,5 @@ func (suite *RegistrationTestSuite) TestRegistrationPublishToTopic() {
 }
 
 func TestRegistrationTestSuite(t *testing.T) {
-	suite.Run(t, new(RegistrationTestSuite))
+	suite.Run(t, new(RSuite))
 }

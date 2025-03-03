@@ -1,0 +1,81 @@
+name: Frontend
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  Test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: "pnpm"
+          cache-dependency-path: "./developer_area/frontend/pnpm-lock.yaml"
+
+      - name: Install frontend dependencies
+        working-directory: ./developer_area/frontend
+        run: pnpm install
+
+      - name: Install Playwright browsers
+        working-directory: ./developer_area/frontend
+        run: pnpm exec playwright install --with-deps --only-shell chromium
+
+      - name: Download Encore CLI script
+        uses: sozo-design/curl@v1.0.2
+        with:
+          args: --output install.sh -L https://encore.dev/install.sh
+
+      - name: Install Encore CLI
+        run: bash install.sh
+
+      - name: Log in to Encore
+        run: |
+          /home/runner/.encore/bin/encore auth login --auth-key="${{ secrets.ENCORE_AUTH_KEY }}"
+
+      - name: Start backend
+        run: /home/runner/.encore/bin/encore run &
+
+      - name: Wait for backend healthcheck
+        uses: jtalk/url-health-check-action@v4
+        with:
+          url: http://localhost:4000/health
+          follow-redirect: false
+          max-attempts: 12
+          retry-delay: 5s
+          retry-all: false
+
+      - name: Start frontend
+        working-directory: ./developer_area/frontend
+        run: VITE_ENCORE_ENVIRONMENT="${{ vars.VITE_ENCORE_ENVIRONMENT }}" pnpm dev &
+
+      - name: Wait for frontend healthcheck
+        uses: jtalk/url-health-check-action@v4
+        with:
+          url: http://localhost:5173/singup
+          follow-redirect: false
+          max-attempts: 12
+          retry-delay: 5s
+          retry-all: false
+
+      - name: Run tests
+        working-directory: ./developer_area/frontend
+        run: pnpm exec playwright test --project=chromium
+
+      - name: Upload playwright report
+        uses: actions/upload-artifact@v4
+        if: ${{ failure() && !env.ACT }}
+        with:
+          name: playwright-report
+          path: developer_area/frontend/playwright-report/
+          retention-days: 30
