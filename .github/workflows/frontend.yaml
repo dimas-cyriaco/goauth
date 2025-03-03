@@ -44,7 +44,7 @@ jobs:
           /home/runner/.encore/bin/encore auth login --auth-key="${{ secrets.ENCORE_AUTH_KEY }}"
 
       - name: Start Backend
-        run: nohup /home/runner/.encore/bin/encore run &
+        run: /home/runner/.encore/bin/encore run &
 
       - name: Wait for backend server to be ready on port 4000
         run: |
@@ -56,7 +56,7 @@ jobs:
 
       - name: Start Frontend
         working-directory: ./developer_area/frontend
-        run: nohup pnpm dev &
+        run: pnpm dev &
 
       - name: Wait for frontend server to be ready on port 5173
         run: |
