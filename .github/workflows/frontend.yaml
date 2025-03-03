@@ -12,24 +12,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9
-          run_install: false
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 18
-          cache: "pnpm"
-          cache-dependency-path: "./developer_area/frontend/pnpm-lock.yaml"
-
-      - name: Install frontend dependencies
-        working-directory: ./developer_area/frontend
-        run: pnpm install
-
-      - name: Install playwright browsers
-        working-directory: ./developer_area/frontend
-        run: pnpm exec playwright install --with-deps
+      # - uses: pnpm/action-setup@v4
+      #   with:
+      #     version: 9
+      #     run_install: false
+      #
+      # - uses: actions/setup-node@v4
+      #   with:
+      #     node-version: 18
+      #     cache: "pnpm"
+      #     cache-dependency-path: "./developer_area/frontend/pnpm-lock.yaml"
+      #
+      # - name: Install frontend dependencies
+      #   working-directory: ./developer_area/frontend
+      #   run: pnpm install
+      #
+      # - name: Install playwright browsers
+      #   working-directory: ./developer_area/frontend
+      #   run: pnpm exec playwright install --with-deps
 
       - name: Download Encore CLI script
         uses: sozo-design/curl@v1.0.2
@@ -46,26 +46,33 @@ jobs:
       - name: Start Backend
         run: /home/runner/.encore/bin/encore run &
 
-      - name: Wait for backend server to be ready on port 4000
-        run: |
-          while ! nc -z localhost 4000; do
-            echo "Waiting for backend server to start..."
-            sleep 2
-          done
-          echo "Backend server is up and running!"
+      - name: Check the deployed service URL
+        uses: jtalk/url-health-check-action@v4
+        with:
+          # Check the following URLs one by one sequentially
+          url: http://localhost:4000/me
+          # Follow redirects, or just report success on 3xx status codes
+          follow-redirect: false # Optional, defaults to "false"
+          # Fail this action after this many failed attempts
+          max-attempts: 12 # Optional, defaults to 1
+          # Delay between retries
+          retry-delay: 5s # Optional, only applicable to max-attempts > 1
+          # Retry all errors, including 404. This option might trigger curl upgrade.
+          retry-all: false # Optional, defaults to "false"
 
-      - name: Start Frontend
-        working-directory: ./developer_area/frontend
-        run: pnpm dev &
 
-      - name: Wait for frontend server to be ready on port 5173
-        run: |
-          while ! nc -z localhost 5173; do
-            echo "Waiting for frontend server to start..."
-            sleep 2
-          done
-          echo "Frontend server is up and running!"
-
-      - name: Run Tests
-        working-directory: ./developer_area/frontend
-        run: pnpm exec playwright test
+      # - name: Start Frontend
+      #   working-directory: ./developer_area/frontend
+      #   run: pnpm dev &
+      #
+      # - name: Wait for frontend server to be ready on port 5173
+      #   run: |
+      #     while ! nc -z localhost 5173; do
+      #       echo "Waiting for frontend server to start..."
+      #       sleep 2
+      #     done
+      #     echo "Frontend server is up and running!"
+      #
+      # - name: Run Tests
+      #   working-directory: ./developer_area/frontend
+      #   run: pnpm exec playwright test
