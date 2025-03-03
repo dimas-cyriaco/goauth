@@ -43,16 +43,28 @@ jobs:
         run: |
           /home/runner/.encore/bin/encore auth login --auth-key="${{ secrets.ENCORE_AUTH_KEY }}"
 
-      - name: Start Encore
+      - name: Start Backend
         run: nohup /home/runner/.encore/bin/encore run --port=4001 &
 
-      - name: Wait for server to be ready on port 4001
+      - name: Wait for backend server to be ready on port 4001
         run: |
           while ! nc -z localhost 4001; do
-            echo "Waiting for server to start..."
+            echo "Waiting for backend server to start..."
             sleep 2
           done
-          echo "Server is up and running!"
+          echo "Backend server is up and running!"
+
+      - name: Start Frontend
+        working-directory: ./developer_area/frontend
+        run: nohup pnpm dev &
+
+      - name: Wait for frontend server to be ready on port 5173
+        run: |
+          while ! nc -z localhost 5173; do
+            echo "Waiting for frontend server to start..."
+            sleep 2
+          done
+          echo "Frontend server is up and running!"
 
       - name: Run Tests
         working-directory: ./developer_area/frontend
