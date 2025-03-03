@@ -44,7 +44,15 @@ jobs:
           /home/runner/.encore/bin/encore auth login --auth-key="${{ secrets.ENCORE_AUTH_KEY }}"
 
       - name: Start Encore
-        run: /home/runner/.encore/bin/encore run --port=4001
+        run: nohup /home/runner/.encore/bin/encore run --port=4001 &
+
+      - name: Wait for server to be ready on port 4001
+        run: |
+          while ! nc -z localhost 4001; do
+            echo "Waiting for server to start..."
+            sleep 2
+          done
+          echo "Server is up and running!"
 
       - name: Run Tests
         working-directory: ./developer_area/frontend
