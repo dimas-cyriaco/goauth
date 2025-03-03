@@ -57,7 +57,7 @@ jobs:
 
       - name: Start Frontend
         working-directory: ./developer_area/frontend
-        run: pnpm dev &
+        run: VITE_ENCORE_ENVIRONMENT="${{ vars.VITE_ENCORE_ENVIRONMENT }}" pnpm dev &
 
       - name: Check the frontend URL
         uses: jtalk/url-health-check-action@v4

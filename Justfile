@@ -8,6 +8,10 @@ build:
     echo "Building..."
     encore build
 
+# Simulate an push on the CI
+ci-push:
+  act -s ENCORE_AUTH_KEY=$(echo $ENCORE_AUTH_KEY) -W .github/workflows/frontend.yaml push
+
 # Run the application
 run:
     encore run
