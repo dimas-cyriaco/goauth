@@ -2,7 +2,7 @@ version: "0.5"
 
 processes:
   backend:
-    command: encore run
+    command: mise run:backend
     availability:
       restart: "always"
     readiness_probe:
@@ -11,6 +11,7 @@ processes:
         scheme: http
         path: "/health"
         port: 4000
+      initial_delay_seconds: 5
       period_seconds: 300
     liveness_probe:
       http_get:
@@ -21,7 +22,7 @@ processes:
       period_seconds: 300
 
   frontend:
-    command: pnpm --prefix developer_area/frontend dev
+    command: mise run:frontend
     availability:
       restart: "always"
     readiness_probe:
@@ -30,6 +31,7 @@ processes:
         scheme: http
         path: "/signup"
         port: 5173
+      initial_delay_seconds: 5
       period_seconds: 300
     liveness_probe:
       http_get:
@@ -43,10 +45,10 @@ processes:
         condition: process_healthy
 
   test-backend:
-    command: gotestsum --watch --raw-command -- encore test ./... -json
+    command: mise test:backend
 
   test-frontend:
-    command: pnpm --prefix developer_area/frontend exec playwright test --ui
+    command: mise test:frontend
     depends_on:
       frontend:
         condition: process_healthy

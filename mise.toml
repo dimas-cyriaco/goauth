@@ -3,13 +3,14 @@ act = "0.2.75"
 age = "1.2.1"
 go = "1.24.0"
 gotestsum = "1.12.0"
-node = "23.9.0"
+node = "22.14.0"
 pnpm = "10.5.2"
 sops = "3.9.4"
 usage = "2.0.5"
 
 [env]
 APP_ENV = "local"
+VITE_ENCORE_ENVIRONMENT = { value = "{{env.APP_ENV}}" }
 _.file = ".env.secrets.json"
 
 [tasks."build:backend"]
@@ -24,17 +25,25 @@ run = "gotestsum --raw-command -- encore test ./... -json"
 description = "Run Backend tests in watch mode"
 run = "gotestsum --watch --raw-command -- encore test ./... -json"
 
+[tasks."test:frontend"]
+description = "Run Frontend tests"
+run = "pnpm --prefix developer_area/frontend exec playwright test --ui"
+
+[tasks."test:frontend:headless"]
+description = "Run Frontend tests"
+run = "pnpm --prefix developer_area/frontend exec playwright test"
+
 [tasks."ci:push"]
 description = "Simulate a push on the CI"
-run = "act --var VITE_ENCORE_ENVIRONMENT={{env.APP_ENV}} --var ACTIONS_RUNTIME_TOKEN=foobar -s ENCORE_AUTH_KEY=$(echo $ENCORE_AUTH_KEY) push"
+run = "act --var ACTIONS_RUNTIME_TOKEN=foobar -s push"
 
 [tasks."ci:push:frontend"]
 description = "Simulate a push on the CI (Frontend)"
-run = "act --var VITE_ENCORE_ENVIRONMENT={{env.APP_ENV}} --var ACTIONS_RUNTIME_TOKEN=foobar -s ENCORE_AUTH_KEY=$(echo $ENCORE_AUTH_KEY) -W .github/workflows/frontend.yaml push"
+run = "act --var ACTIONS_RUNTIME_TOKEN=foobar -s -W .github/workflows/frontend.yaml push"
 
 [tasks."ci:push:backend"]
 description = "Simulate a push on the CI (Backend)"
-run = "act --var VITE_ENCORE_ENVIRONMENT={{env.APP_ENV}} --var ACTIONS_RUNTIME_TOKEN=foobar -s ENCORE_AUTH_KEY=$(echo $ENCORE_AUTH_KEY) -W .github/workflows/backend.yaml push"
+run = "act --var ACTIONS_RUNTIME_TOKEN=foobar -s -W .github/workflows/backend.yaml push"
 
 [tasks."pc:up"]
 description = "Start all the services with Process Compose"
