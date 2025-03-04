@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"encore.app/developer_area/utils"
+	"encore.app/developer_area/internal/utils"
 	"encore.dev/et"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"

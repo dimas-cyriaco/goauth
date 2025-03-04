@@ -7,7 +7,7 @@ import (
 	"net/url"
 	"strings"
 
-	"encore.app/developer_area/utils"
+	"encore.app/developer_area/internal/utils"
 	"encore.dev/et"
 	"encore.dev/storage/sqldb"
 	"github.com/charmbracelet/log"

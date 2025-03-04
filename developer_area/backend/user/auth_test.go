@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"encore.app/developer_area/internal/tokens"
-	"encore.app/developer_area/utils"
+	"encore.app/developer_area/internal/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 )
