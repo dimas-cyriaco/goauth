@@ -54,7 +54,7 @@ run = "process-compose process logs test-backend -f"
 
 [tasks."run:backend"]
 description = "Run Backend"
-run = "encore run --debug=break"
+run = "encore run --json"
 
 [tasks."run:frontend"]
 description = "Run Frontend"

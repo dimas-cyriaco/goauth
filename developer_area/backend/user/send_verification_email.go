@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"encore.app/developer_area/internal/tokens"
-	"encore.app/developer_area/utils"
+	"encore.app/developer_area/internal/utils"
 	"encore.dev/config"
 	"encore.dev/pubsub"
 	"encore.dev/rlog"

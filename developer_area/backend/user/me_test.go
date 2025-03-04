@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"testing"
 
-	"encore.app/developer_area/utils"
+	"encore.app/developer_area/internal/utils"
 	"encore.dev/beta/auth"
 	"encore.dev/et"
 	"github.com/stretchr/testify/assert"

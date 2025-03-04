@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"encore.app/developer_area/utils"
+	"encore.app/developer_area/internal/utils"
 	"encore.dev/beta/errs"
 	"encore.dev/rlog"
 	"github.com/go-playground/mold/v4/modifiers"

@@ -1,0 +1,7 @@
+[daemons.backend]
+run = "mise run:backend"
+auto = ["start", "stop"]
+
+[daemons.frontend]
+run = "mise run:frontend"
+auto = ["start", "stop"]
