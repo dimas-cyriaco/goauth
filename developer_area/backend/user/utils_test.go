@@ -37,8 +37,6 @@ func (suite *UserTestSuite) SetupTest() {
 //
 // It uses the default suite email and password to register a new user.
 func (suite *UserTestSuite) RegisterUser() (int, error) {
-	log.Infof("🪵 suite.email: %v\n", suite.email)
-	log.Infof("🪵 suite.password: %v\n", suite.password)
 	params := RegistrationParams{
 		Email:                suite.email,
 		Password:             suite.password,

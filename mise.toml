@@ -63,7 +63,7 @@ run = "process-compose process logs test-backend -f"
 
 [tasks."run:backend"]
 description = "Run Backend"
-run = "encore run --json"
+run = "encore run"
 
 [tasks."run:frontend"]
 description = "Run Frontend"

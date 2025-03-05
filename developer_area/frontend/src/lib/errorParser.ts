@@ -61,7 +61,6 @@ export const mapEncoreErrorToFormErrors = (
   }
 
   const validationErrors = parseEncoreError(error.message)
-  console.log('🪵 validationErrors', JSON.stringify(validationErrors))
 
   const userFriendlyErrors: EncoreValidationErrors = {}
 

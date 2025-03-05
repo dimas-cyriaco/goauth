@@ -12,6 +12,8 @@ import (
 
 //encore:api public raw method=POST path=/login
 func (s *Service) Login(response http.ResponseWriter, request *http.Request) {
+	response.Header().Set("Content-Type", "application/json")
+
 	email := request.FormValue("email")
 	password := request.FormValue("password")
 
@@ -60,7 +62,7 @@ func (s *Service) Login(response http.ResponseWriter, request *http.Request) {
 		Path:     "/",
 		HttpOnly: true,
 		Secure:   true,
-		SameSite: http.SameSiteStrictMode,
+		SameSite: http.SameSiteNoneMode,
 	})
 
 	// Set the csrf token cookie
@@ -70,7 +72,7 @@ func (s *Service) Login(response http.ResponseWriter, request *http.Request) {
 		Path:     "/",
 		HttpOnly: false,
 		Secure:   true,
-		SameSite: http.SameSiteStrictMode,
+		SameSite: http.SameSiteNoneMode,
 	})
 
 	// Return success response

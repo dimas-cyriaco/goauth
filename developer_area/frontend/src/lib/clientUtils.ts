@@ -1,10 +1,17 @@
-import Client, { Environment, Local } from './client'
+import Client, { Environment, Local, user } from './client'
 
-export function createAPIClient(): Client {
+type createAPIClientParams = {
+  auth?: user.AuthData
+  fetcher?: typeof fetch
+}
+
+export function createAPIClient(params?: createAPIClientParams): Client {
   const clientTarget =
     import.meta.env.VITE_ENCORE_ENVIRONMENT === 'local' ?
       Local
     : Environment('staging')
 
-  return new Client(clientTarget)
+  const { auth, fetcher } = params || {}
+
+  return new Client(clientTarget, { auth, fetcher })
 }

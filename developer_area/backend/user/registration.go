@@ -79,7 +79,7 @@ func (s *Service) Registration(ctx context.Context, params *RegistrationParams) 
 		&EmailVerificationRequestedEvent{UserID: user.ID},
 	)
 	if err != nil {
-		rlog.Error("Error publishing EmailVerificationRequestedEvent.", "err", err)
+		rlog.Warn("Error publishing EmailVerificationRequestedEvent.", "err", err)
 	}
 
 	return &RegistrationResponse{ID: user.ID}, nil
@@ -93,9 +93,9 @@ func hashPassword(password string) (string, error) {
 }
 
 func validatePassword(hashedPassword string, password string) bool {
-	rlog.Debug("hashedPassword", "hashedPassword", hashedPassword)
-	rlog.Debug("password", "password", password)
 	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
-	rlog.Error("wrong email or password", "err", err)
+	if err != nil {
+		rlog.Error("error validationg password", "err", err)
+	}
 	return err == nil
 }

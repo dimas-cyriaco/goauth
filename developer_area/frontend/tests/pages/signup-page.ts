@@ -14,6 +14,13 @@ export class SignupPage {
   }
 
   async goto() {
+    const link = this.page.getByTestId('link-to-signup')
+
+    if (await link.isVisible()) {
+      await link.click()
+      return
+    }
+
     await this.page.goto('/signup')
   }
 
@@ -29,8 +36,15 @@ export class SignupPage {
     await this.passwordConfirmation.fill(text)
   }
 
-  async clickSubmit() {
+  async clickSubmit(opts?: { noWait: boolean }) {
     await this.submit.click()
+
+    const { noWait } = opts || {}
+    if (noWait) {
+      return
+    }
+
+    await this.page.waitForLoadState('networkidle')
   }
 
   async createUser(email: string, password: string): Promise<void> {

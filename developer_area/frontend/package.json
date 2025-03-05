@@ -10,7 +10,8 @@
     "gen:local": "encore gen client goauth-5g62 --output=./src/lib/client.ts --env=local",
     "prepare": "husky",
     "preview": "vite preview",
-    "test": "vitest"
+    "test": "vitest",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@solidjs/router": "^0.15.3",

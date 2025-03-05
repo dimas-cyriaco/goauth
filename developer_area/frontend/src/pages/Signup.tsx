@@ -10,7 +10,6 @@ export const Signup = () => {
   const [passwordConfirmation, setPasswordConfirmation] = createSignal('')
   const [hasSubmited, setHasSubmited] = createSignal(false)
   const [errors, setErrors] = createSignal<Record<string, string[]>>({})
-  console.log('🪵 errors', errors())
 
   const navigate = useNavigate()
 
@@ -27,25 +26,13 @@ export const Signup = () => {
     }
 
     try {
-      const result = await client.user.Registration(registrationParams)
-      console.log('🪵 result', result)
+      await client.user.Registration(registrationParams)
       setErrors({})
       navigate('/signin')
     } catch (error) {
       if (!isAPIError(error)) {
-        console.error('Unexpected error:', error)
         return
       }
-      console.log('🪵 error', error.details)
-      // console.log('🪵 error', error)
-      // const errors = mapEncoreErrorToFormErrors(
-      //   error,
-      //   MAP_ENCORE_ERROR_TO_MESSAGES,
-      // )
-      // console.log('🪵 errors', errors)
-      // if (!errors) {
-      //   return
-      // }
 
       setErrors(error.details)
     }

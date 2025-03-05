@@ -1,6 +1,7 @@
 import { useNavigate } from '@solidjs/router'
 import { Show, createSignal } from 'solid-js'
 
+import { useAuthContext } from '../contexts/auth-context'
 import { isAPIError } from '../lib/client'
 import { createAPIClient } from '../lib/clientUtils'
 
@@ -9,6 +10,7 @@ export const Signin = () => {
   const [password, setPassword] = createSignal('')
   const [error, setError] = createSignal<string>()
 
+  const [_, { login }] = useAuthContext()
   const navigate = useNavigate()
 
   async function onSubmit(event: Event) {
@@ -21,8 +23,9 @@ export const Signin = () => {
     body.set('password', password())
 
     try {
-      await client.user.Login('POST', body)
+      await client.user.Login('POST', body, { credentials: 'include' })
       setError(undefined)
+      login()
       navigate('/')
     } catch (error) {
       if (isAPIError(error) && error.status === 401) {

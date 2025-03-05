@@ -12,6 +12,13 @@ export class SigninPage {
   }
 
   async goto() {
+    const link = this.page.getByTestId('link-to-signin')
+
+    if (await link.isVisible()) {
+      await link.click()
+      return
+    }
+
     await this.page.goto('/signin')
   }
 
@@ -23,8 +30,15 @@ export class SigninPage {
     await this.password.fill(text)
   }
 
-  async clickSubmit() {
+  async clickSubmit(opts?: { noWait: boolean }) {
     await this.submit.click()
+
+    const { noWait } = opts || {}
+    if (noWait) {
+      return
+    }
+
+    await this.page.waitForURL('/')
   }
 
   async login(email: string, password: string): Promise<void> {
