@@ -7,8 +7,6 @@ import (
 	"encore.app/developer_area/internal/utils"
 	"encore.dev/beta/errs"
 	"encore.dev/rlog"
-	"github.com/go-playground/mold/v4/modifiers"
-	"github.com/go-playground/validator/v10"
 	"github.com/jackc/pgx/v5/pgconn"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -25,25 +23,7 @@ type RegistrationResponse struct {
 }
 
 func (params *RegistrationParams) Validate() error {
-	eb := errs.B().Code(errs.InvalidArgument)
-
-	validate := validator.New()
-	conform := modifiers.New()
-
-	err := conform.Struct(context.Background(), params)
-	if err != nil {
-		return err
-	}
-
-	err = validate.Struct(params)
-	if err != nil {
-		details := utils.GetValidationErrorDetails(validate, err)
-
-		eb.Msg("Validation error").Details(&details)
-
-		return eb.Err()
-	}
-
+	err := utils.ValidateTransform(context.Background(), params)
 	return err
 }
 

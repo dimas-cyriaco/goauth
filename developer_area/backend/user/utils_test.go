@@ -24,6 +24,11 @@ type UserTestSuite struct {
 	password string
 }
 
+func GetUserTestService(ctx context.Context) *Service {
+	db = utils.Must(et.NewTestDatabase(ctx, "user"))
+	return utils.Must(NewUserService(db))
+}
+
 func (suite *UserTestSuite) SetupTest() {
 	suite.ctx = context.Background()
 	suite.db = utils.Must(et.NewTestDatabase(suite.ctx, "user"))

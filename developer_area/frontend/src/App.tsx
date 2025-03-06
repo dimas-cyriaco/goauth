@@ -36,7 +36,7 @@ const fetchMe = async () => {
 
     const me = await client.user.Me()
     return !!me
-  } catch (error) {
+  } catch {
     return false
   }
 }
