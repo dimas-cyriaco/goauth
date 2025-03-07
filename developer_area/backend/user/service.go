@@ -9,11 +9,8 @@ import (
 )
 
 type User struct {
-	// ID is a unique ID for the user.
-	ID int `json:"id"`
-	// Email is the user's Email.
-	Email string `json:"email" encore:"sensitive"`
-	// HashedPassword is the hashed version of the user's password.
+	ID              int        `json:"id"`
+	Email           string     `json:"email" encore:"sensitive"`
 	HashedPassword  string     `encore:"sensitive"`
 	CreatedAt       time.Time  `json:"created_at"`
 	UpdatedAt       time.Time  `json:"updated_at"`
