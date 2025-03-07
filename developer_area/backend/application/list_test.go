@@ -7,6 +7,7 @@ import (
 	user_service "encore.app/developer_area/backend/user"
 	"encore.app/developer_area/internal/utils"
 	"encore.dev/beta/auth"
+	"encore.dev/beta/errs"
 	"encore.dev/et"
 	"github.com/go-faker/faker/v4"
 	"github.com/stretchr/testify/assert"
@@ -123,11 +124,71 @@ func (suite *ALSuite) TestFilterByOwnerID() {
 	assert.Equal(suite.T(), response.Applications[0].Name, appName)
 }
 
-// TODO: Test owner
-// TODO: Test min page
-// TODO: Test max page
-// TODO: Test min per_page
-// TODO: Test max per_page
+func (suite *ALSuite) TestValidateMinPage() {
+	// Assert
+
+	params := ApplicationListParams{
+		Page: -1,
+	}
+
+	// Act
+
+	validationError := params.Validate()
+
+	// Assert
+
+	assert.NotNil(suite.T(), validationError)
+
+	errors := validationError.(*errs.Error)
+	expected := &utils.ValidationErrors{
+		"page": {"Page must be 1 or greater"},
+	}
+	assert.Equal(suite.T(), expected, errors.Details)
+}
+
+func (suite *ALSuite) TestValidateMinPerPage() {
+	// Assert
+
+	params := ApplicationListParams{
+		PerPage: -1,
+	}
+
+	// Act
+
+	validationError := params.Validate()
+
+	// Assert
+
+	assert.NotNil(suite.T(), validationError)
+
+	errors := validationError.(*errs.Error)
+	expected := &utils.ValidationErrors{
+		"per_page": {"PerPage must be 1 or greater"},
+	}
+	assert.Equal(suite.T(), expected, errors.Details)
+}
+
+func (suite *ALSuite) TestValidateMaxPerPage() {
+	// Assert
+
+	params := ApplicationListParams{
+		PerPage: 101,
+	}
+
+	// Act
+
+	validationError := params.Validate()
+
+	// Assert
+
+	assert.NotNil(suite.T(), validationError)
+
+	errors := validationError.(*errs.Error)
+	expected := &utils.ValidationErrors{
+		"per_page": {"PerPage must be 100 or less"},
+	}
+	assert.Equal(suite.T(), expected, errors.Details)
+}
 
 func TestAppListTestSuite(t *testing.T) {
 	suite.Run(t, new(ALSuite))

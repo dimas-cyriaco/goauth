@@ -48,12 +48,9 @@ func (s *Service) List(ctx context.Context, params *ApplicationListParams) (*App
 
 	query := s.db.Model(&Application{}).Where("owner_id = $1", ownerID)
 
-	// TODO:   Filter by user ID.
-
 	var totalCount int64
 	if err := query.Count(&totalCount).Error; err != nil {
-		// TODO: Log params and user.ID
-		rlog.Error("Database error counting applications.", "err", err)
+		rlog.Error("Database error counting applications.", "err", err, "userID", userID)
 		return nil, &errs.Error{Code: errs.Unknown, Message: "Unknown error"}
 	}
 
@@ -63,8 +60,7 @@ func (s *Service) List(ctx context.Context, params *ApplicationListParams) (*App
 		Limit(perPage).
 		Find(&applications).Error
 	if err != nil {
-		// TODO: Log params and user.ID
-		rlog.Error("Database error fetching applications.", "err", err)
+		rlog.Error("Database error fetching applications.", "err", err, "userID", userID, "page", page, "perPage", perPage)
 		return nil, &errs.Error{Code: errs.Unknown, Message: "Unknown error"}
 	}
 
