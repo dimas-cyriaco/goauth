@@ -75,11 +75,7 @@ export const Signin = () => {
           </label>
         </fieldset>
 
-        <input
-          data-testid="submit"
-          type="submit"
-          value="Signin"
-        />
+        <input data-testid="submit" type="submit" value="Signin" />
       </form>
     </>
   )

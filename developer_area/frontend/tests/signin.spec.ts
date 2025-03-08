@@ -1,4 +1,3 @@
-import { faker } from '@faker-js/faker'
 import { expect, test } from '@playwright/test'
 
 import { SigninPage } from './pages/signin-page'
@@ -18,11 +17,7 @@ test.describe('Signup Page', () => {
   test('should redirect to Home page on success', async ({ page }) => {
     // Arrange
 
-    const email = faker.internet.email()
-    const password = faker.internet.password()
-
-    const signupPage = new SignupPage(page)
-    await signupPage.createUser(email, password)
+    const { email, password } = await SignupPage.createUser(page)
 
     const signinPage = new SigninPage(page)
     await signinPage.goto()
@@ -42,14 +37,8 @@ test.describe('Signup Page', () => {
   test('should not show login link if user is logged in', async ({ page }) => {
     // Arrange
 
-    const email = faker.internet.email()
-    const password = faker.internet.password()
-
-    const signupPage = new SignupPage(page)
-    await signupPage.createUser(email, password)
-
-    const signinPage = new SigninPage(page)
-    await signinPage.login(email, password)
+    const { email, password } = await SignupPage.createUser(page)
+    await SigninPage.login(page, email, password)
 
     // Act
 
@@ -63,14 +52,8 @@ test.describe('Signup Page', () => {
   test('should keep login state on page reload', async ({ page }) => {
     // Arrange
 
-    const email = faker.internet.email()
-    const password = faker.internet.password()
-
-    const signupPage = new SignupPage(page)
-    await signupPage.createUser(email, password)
-
-    const signinPage = new SigninPage(page)
-    await signinPage.login(email, password)
+    const { email, password } = await SignupPage.createUser(page)
+    await SigninPage.login(page, email, password)
 
     // Act
 
@@ -86,14 +69,9 @@ test.describe('Signup Page', () => {
   }) => {
     // Arrange
 
+    const { email } = await SignupPage.createUser(page)
+
     const signinPage = new SigninPage(page)
-
-    const email = faker.internet.email()
-    const password = faker.internet.password()
-
-    const signupPage = new SignupPage(page)
-    await signupPage.createUser(email, password)
-
     await signinPage.goto()
 
     // Act

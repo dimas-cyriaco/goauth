@@ -47,4 +47,17 @@ export class SigninPage {
     await this.fillPassword(password)
     await this.clickSubmit()
   }
+
+  static async login(
+    page: Page,
+    email: string,
+    password: string,
+  ): Promise<void> {
+    const signinPage = new SigninPage(page)
+
+    await signinPage.goto()
+    await signinPage.fillEmail(email)
+    await signinPage.fillPassword(password)
+    await signinPage.clickSubmit()
+  }
 }

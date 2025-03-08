@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker'
 import type { Locator, Page } from '@playwright/test'
 
 export class SignupPage {
@@ -53,5 +54,26 @@ export class SignupPage {
     await this.fillPassword(password)
     await this.fillPasswordConfirmation(password)
     await this.clickSubmit()
+  }
+
+  static async createUser(
+    page: Page,
+  ): Promise<{ email: string; password: string }> {
+    const signupPage = new SignupPage(page)
+
+    const email = faker.internet.email()
+    const password = faker.internet.password()
+
+    await signupPage.goto()
+    await signupPage.fillEmail(email)
+    await signupPage.fillPassword(password)
+    await signupPage.fillPasswordConfirmation(password)
+
+    await signupPage.clickSubmit()
+
+    return {
+      email,
+      password,
+    }
   }
 }
