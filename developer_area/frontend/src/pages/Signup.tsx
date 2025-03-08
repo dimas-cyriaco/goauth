@@ -57,10 +57,7 @@ export const Signup = () => {
               value={email()}
             />
             <Show when={errors().email}>
-              <small
-                data-testid="email-error"
-                id="email-helper"
-              >
+              <small data-testid="email-error" id="email-helper">
                 {errors().email?.join(' ')}
               </small>
             </Show>
@@ -80,10 +77,7 @@ export const Signup = () => {
               value={password()}
             />
             <Show when={errors().password}>
-              <small
-                data-testid="password-error"
-                id="password-helper"
-              >
+              <small data-testid="password-error" id="password-helper">
                 {errors().password?.join(' ')}
               </small>
             </Show>
@@ -94,9 +88,7 @@ export const Signup = () => {
           <label>
             Password Confirmation
             <input
-              aria-invalid={
-                hasSubmited() ? !!errors().password_confirmation : undefined
-              }
+              aria-invalid={hasSubmited() ? !!errors().password_confirmation : undefined}
               aria-label="PasswordConfirmation"
               data-testid="password-confirmation"
               name="password_confirmation"
@@ -105,36 +97,15 @@ export const Signup = () => {
               value={passwordConfirmation()}
             />
             <Show when={errors().password_confirmation}>
-              <small
-                data-testid="password-confirmation-error"
-                id="password_confirmation-helper"
-              >
+              <small data-testid="password-confirmation-error" id="password_confirmation-helper">
                 {errors().password_confirmation?.join(' ')}
               </small>
             </Show>
           </label>
         </fieldset>
 
-        <input
-          data-testid="submit"
-          type="submit"
-          value="Create Account"
-        />
+        <input data-testid="submit" type="submit" value="Create Account" />
       </form>
     </>
   )
 }
-
-// const MAP_ENCORE_ERROR_TO_MESSAGES: Record<string, Record<string, string>> = {
-//   Email: {
-//     taken: 'Email already taken',
-//     email: 'Invalid email format',
-//   },
-//   Password: {
-//     min: 'Password too short. Should be at least 6 characters',
-//     max: 'Password too long. Should be at most 72 characters',
-//   },
-//   PasswordConfirmation: {
-//     eqcsfield: 'Password confirmation does not match password',
-//   },
-// }

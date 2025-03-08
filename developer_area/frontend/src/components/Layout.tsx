@@ -11,10 +11,7 @@ export const Layout: ParentComponent = (props) => {
         <nav>
           <ul>
             <li>
-              <a
-                data-testid="link-to-home"
-                href="/"
-              >
+              <a data-testid="link-to-home" href="/">
                 <strong>GOAuth</strong>
               </a>
             </li>
@@ -23,19 +20,13 @@ export const Layout: ParentComponent = (props) => {
           <ul>
             <Show when={!isLogged()}>
               <li>
-                <a
-                  data-testid="link-to-signup"
-                  href="/signup"
-                >
+                <a data-testid="link-to-signup" href="/signup">
                   Signup
                 </a>
               </li>
 
               <li>
-                <a
-                  data-testid="link-to-signin"
-                  href="/signin"
-                >
+                <a data-testid="link-to-signin" href="/signin">
                   Signin
                 </a>
               </li>
@@ -43,10 +34,13 @@ export const Layout: ParentComponent = (props) => {
 
             <Show when={isLogged()}>
               <li>
-                <a
-                  data-testid="link-to-signout"
-                  href="/signout"
-                >
+                <a data-testid="link-to-create-applications" href="/applications/new">
+                  Create Application
+                </a>
+              </li>
+
+              <li>
+                <a data-testid="link-to-signout" href="/signout">
                   Signout
                 </a>
               </li>

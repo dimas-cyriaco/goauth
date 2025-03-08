@@ -13,6 +13,10 @@ APP_ENV = "local"
 VITE_ENCORE_ENVIRONMENT = { value = "{{env.APP_ENV}}" }
 _.file = ".env.secrets.json"
 
+[tasks."gen:client:local"]
+description = "Build Typescript client (Local)"
+run = "encore gen client goauth-5g62 --output=./developer_area/frontend/src/lib/client.ts --env=local"
+
 [tasks."build:backend"]
 description = "Build Backend Docker images"
 run = "encore build docker goauth"
