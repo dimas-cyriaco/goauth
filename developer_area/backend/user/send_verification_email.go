@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strconv"
 
-	"encore.app/developer_area/internal/tokens"
-	"encore.app/developer_area/internal/utils"
+	"encore.app/developer_area/backend/internal/tokens"
+	"encore.app/developer_area/backend/internal/utils"
 	"encore.dev/config"
 	"encore.dev/pubsub"
 	"encore.dev/rlog"

@@ -3,7 +3,7 @@ package application
 import (
 	"context"
 
-	"encore.app/developer_area/internal/utils"
+	"encore.app/developer_area/backend/internal/utils"
 	"encore.dev/et"
 	"encore.dev/storage/sqldb"
 	"github.com/stretchr/testify/suite"

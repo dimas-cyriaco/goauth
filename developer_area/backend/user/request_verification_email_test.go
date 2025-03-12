@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"encore.app/developer_area/internal/utils"
+	"encore.app/developer_area/backend/internal/utils"
 	"encore.dev/et"
 	"github.com/go-faker/faker/v4"
 	"github.com/stretchr/testify/assert"

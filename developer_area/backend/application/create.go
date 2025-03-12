@@ -5,7 +5,7 @@ import (
 	"errors"
 	"strconv"
 
-	"encore.app/developer_area/internal/utils"
+	"encore.app/developer_area/backend/internal/utils"
 	"encore.dev/beta/auth"
 	"encore.dev/beta/errs"
 	"encore.dev/rlog"

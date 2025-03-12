@@ -3,7 +3,7 @@ package user
 import (
 	"testing"
 
-	"encore.app/developer_area/internal/utils"
+	"encore.app/developer_area/backend/internal/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 )

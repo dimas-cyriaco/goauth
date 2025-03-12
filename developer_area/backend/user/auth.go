@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"encore.app/developer_area/internal/tokens"
+	"encore.app/developer_area/backend/internal/tokens"
 	"encore.dev/beta/auth"
 	"encore.dev/beta/errs"
 	"encore.dev/storage/sqldb"

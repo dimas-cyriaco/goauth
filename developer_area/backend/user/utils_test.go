@@ -7,10 +7,9 @@ import (
 	"net/url"
 	"strings"
 
-	"encore.app/developer_area/internal/utils"
+	"encore.app/developer_area/backend/internal/utils"
 	"encore.dev/et"
 	"encore.dev/storage/sqldb"
-	"github.com/charmbracelet/log"
 	"github.com/go-faker/faker/v4"
 	"github.com/stretchr/testify/suite"
 )
@@ -56,8 +55,6 @@ func (suite *UserTestSuite) RegisterUser() (int, error) {
 //
 // To use different credentials, use the `(suite *UserTestSuite) LoginWith(email, password string)` method.
 func (suite *UserTestSuite) Login() *httptest.ResponseRecorder {
-	log.Infof("🪵 suite.email: %v\n", suite.email)
-	log.Infof("🪵 suite.password: %v\n", suite.password)
 	return suite.LoginWith(suite.email, suite.password)
 }
 

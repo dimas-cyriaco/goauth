@@ -39,15 +39,15 @@ run = "pnpm --prefix developer_area/frontend exec playwright test"
 
 [tasks."ci:push"]
 description = "Simulate a push on the CI"
-run = "act --var ACTIONS_RUNTIME_TOKEN=foobar -s push"
+run = "act --var ACTIONS_RUNTIME_TOKEN=foobar -s ENCORE_AUTH_KEY={{env.ENCORE_AUTH_KEY}} push"
 
 [tasks."ci:push:frontend"]
 description = "Simulate a push on the CI (Frontend)"
-run = "act --var ACTIONS_RUNTIME_TOKEN=foobar -s -W .github/workflows/frontend.yaml push"
+run = "act --var ACTIONS_RUNTIME_TOKEN=foobar -s ENCORE_AUTH_KEY={{env.ENCORE_AUTH_KEY}} -W .github/workflows/frontend.yaml push"
 
 [tasks."ci:push:backend"]
 description = "Simulate a push on the CI (Backend)"
-run = "act --var ACTIONS_RUNTIME_TOKEN=foobar -s -W .github/workflows/backend.yaml push"
+run = "act --var ACTIONS_RUNTIME_TOKEN=foobar -s ENCORE_AUTH_KEY=\"{{env.ENCORE_AUTH_KEY}}\" -W .github/workflows/backend.yaml push"
 
 [tasks."pc:up"]
 description = "Start all the services with Process Compose"

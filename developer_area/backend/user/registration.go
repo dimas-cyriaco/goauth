@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"encore.app/developer_area/internal/utils"
+	"encore.app/developer_area/backend/internal/utils"
 	"encore.dev/beta/errs"
 	"encore.dev/rlog"
 	"github.com/jackc/pgx/v5/pgconn"

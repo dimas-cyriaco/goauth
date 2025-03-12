@@ -4,8 +4,8 @@ import (
 	"strconv"
 	"testing"
 
+	"encore.app/developer_area/backend/internal/utils"
 	user_service "encore.app/developer_area/backend/user"
-	"encore.app/developer_area/internal/utils"
 	"encore.dev/beta/auth"
 	"encore.dev/beta/errs"
 	"encore.dev/et"
