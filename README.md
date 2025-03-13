@@ -5,7 +5,8 @@ intricacies of OAuth.
 
 ## ⚡️ Requirements
 
-The project uses [Mise](https://mise.jdx.dev/) for tools version managing and task runner.
+The project uses [Mise](https://mise.jdx.dev/) for tools version managing and
+task runner.
 
 It's necessary to install some extra tools that Mise do not have support yet:
 
