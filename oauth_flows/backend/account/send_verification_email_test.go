@@ -30,11 +30,11 @@ func (suite *SendVerificationEmailTestSuit) TestSendVerificationEmail() {
 
 	et.SetCfg(mailConfig.SendEmails, true)
 
-	userID := Must(suite.RegisterAccount())
+	accountID := Must(suite.RegisterAccount())
 
 	mockMailer := new(MockMailer)
 
-	link := Must(generateEmailVerificationLinkForUser(&db.Account{ID: userID}))
+	link := Must(generateEmailVerificationLinkForAccount(&db.Account{ID: accountID}))
 	emailBody := fmt.Sprintf("Welcome to GOAuth. To verify your email click this link: %s", link)
 
 	mockMailer.On("SendEmail", suite.email, "Welcome to GOAuth", emailBody, &MailerConfig{
@@ -48,7 +48,7 @@ func (suite *SendVerificationEmailTestSuit) TestSendVerificationEmail() {
 	// Act
 
 	result := SendVerificationEmail(suite.ctx, &EmailVerificationRequestedEvent{
-		UserID: userID,
+		AccountID: accountID,
 	}, mockMailer, suite.db)
 
 	// Assert

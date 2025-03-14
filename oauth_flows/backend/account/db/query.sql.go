@@ -9,6 +9,24 @@ import (
 	"context"
 )
 
+const byEmail = `-- name: ByEmail :one
+select id, email, hashed_password, created_at, updated_at, email_verified_at FROM accounts where email = $1
+`
+
+func (q *Queries) ByEmail(ctx context.Context, email string) (Account, error) {
+	row := q.db.QueryRow(ctx, byEmail, email)
+	var i Account
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.HashedPassword,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.EmailVerifiedAt,
+	)
+	return i, err
+}
+
 const byID = `-- name: ByID :one
 select id, email, hashed_password, created_at, updated_at, email_verified_at FROM accounts where id = $1
 `
@@ -90,4 +108,15 @@ func (q *Queries) ListAccounts(ctx context.Context) ([]Account, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+const markEmailAsVerified = `-- name: MarkEmailAsVerified :exec
+UPDATE accounts
+set email_verified_at = CURRENT_TIMESTAMP
+WHERE email_verified_at is NULL and id = $1
+`
+
+func (q *Queries) MarkEmailAsVerified(ctx context.Context, id int64) error {
+	_, err := q.db.Exec(ctx, markEmailAsVerified, id)
+	return err
 }
