@@ -1,10 +1,9 @@
-package account_test
+package account
 
 import (
 	"testing"
 
 	"encore.app/internal/validation"
-	"encore.app/oauth_flows/backend/account"
 	"encore.dev/beta/errs"
 	"encore.dev/et"
 	"github.com/go-faker/faker/v4"
@@ -20,7 +19,7 @@ func (suite *AccSuite) TestCreatesUser() {
 	// Act
 
 	password := faker.Word()
-	response := Must(suite.service.Signup(suite.ctx, &account.SignupParams{
+	response := Must(suite.service.Signup(suite.ctx, &SignupParams{
 		Email:                faker.Email(),
 		Password:             password,
 		PasswordConfirmation: password,
@@ -39,7 +38,7 @@ func (suite *AccSuite) TestValidatesPresenceOfEmail() {
 	// Arrange
 
 	password := faker.UUIDDigit()
-	params := account.SignupParams{
+	params := SignupParams{
 		// Without Email
 		Password:             password,
 		PasswordConfirmation: password,
@@ -64,7 +63,7 @@ func (suite *AccSuite) TestValidatesFormatOfEmail() {
 	// Arrange
 
 	password := faker.UUIDDigit()
-	params := account.SignupParams{
+	params := SignupParams{
 		Email:                faker.DomainName(), // Email with wrong format.
 		Password:             password,
 		PasswordConfirmation: password,
@@ -90,7 +89,7 @@ func (suite *AccSuite) TestValidatesFormatOfEmail() {
 func (suite *AccSuite) TestValidatesPresenceOfPassword() {
 	// Arrange
 
-	params := account.SignupParams{
+	params := SignupParams{
 		Email: faker.Email(),
 		// No Password
 		PasswordConfirmation: faker.UUIDDigit(),
@@ -117,7 +116,7 @@ func (suite *AccSuite) TestValidatesPresenceOfPassword() {
 func (suite *AccSuite) TestValidatesPresenceOfPasswordConfirmation() {
 	// Arrange
 
-	params := account.SignupParams{
+	params := SignupParams{
 		Email:    faker.Email(),
 		Password: faker.UUIDDigit(),
 		// No PasswordConfirmation
@@ -143,7 +142,7 @@ func (suite *AccSuite) TestValidatesPresenceOfPasswordConfirmation() {
 func (suite *AccSuite) TestValidatesPasswordConfirmationMatch() {
 	// Arrange
 
-	params := account.SignupParams{
+	params := SignupParams{
 		Email:                faker.Email(),
 		Password:             faker.UUIDDigit(),
 		PasswordConfirmation: "this-will-not-match-the-password",
@@ -169,7 +168,7 @@ func (suite *AccSuite) TestValidatesPasswordConfirmationMatch() {
 func (suite *AccSuite) TestHashesPassword() {
 	// Arrange
 
-	params := account.SignupParams{}
+	params := SignupParams{}
 	faker.FakeData(&params)
 
 	// Act
@@ -188,7 +187,7 @@ func (suite *AccSuite) TestRequiresEmailToBeUnique() {
 	// Arrange
 
 	password := faker.Word()
-	params := account.SignupParams{
+	params := SignupParams{
 		Email:                faker.Email(),
 		Password:             password,
 		PasswordConfirmation: password,
@@ -215,7 +214,7 @@ func (suite *AccSuite) TestTrimsEmailAndPassword() {
 
 	password := faker.Word()
 	email := faker.Email()
-	params := account.SignupParams{
+	params := SignupParams{
 		Email:                "  " + email + "   ",
 		Password:             "  " + password + "   ",
 		PasswordConfirmation: password,
@@ -237,7 +236,7 @@ func (suite *AccSuite) TestPublishToTopic() {
 	// Arrange
 
 	password := faker.Word()
-	params := account.SignupParams{
+	params := SignupParams{
 		Email:                faker.Email(),
 		Password:             password,
 		PasswordConfirmation: password,
@@ -250,7 +249,7 @@ func (suite *AccSuite) TestPublishToTopic() {
 	// Assert
 
 	// Get all published messages on the EmailVerificationRequested topic from this test.
-	msgs := et.Topic(account.EmailVerificationRequested).PublishedMessages()
+	msgs := et.Topic(EmailVerificationRequested).PublishedMessages()
 	assert.Len(suite.T(), msgs, 1)
 }
 
