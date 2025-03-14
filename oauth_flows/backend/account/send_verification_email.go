@@ -50,7 +50,7 @@ func SendVerificationEmail(ctx context.Context, event *EmailVerificationRequeste
 	pgxdb := sqldb.Driver(database)
 	query := db.New(pgxdb)
 
-	account, err := query.ByID(ctx, event.UserID)
+	account, err := query.ByID(ctx, event.AccountID)
 	if err != nil {
 		return err
 	}
@@ -63,7 +63,7 @@ func SendVerificationEmail(ctx context.Context, event *EmailVerificationRequeste
 		SendEmailsFrom: mailConfig.SendEmailsFrom(),
 	}
 
-	link, err := generateEmailVerificationLinkForUser(&account)
+	link, err := generateEmailVerificationLinkForAccount(&account)
 	if err != nil {
 		return err
 	}
@@ -87,8 +87,8 @@ func SendVerificationEmail(ctx context.Context, event *EmailVerificationRequeste
 	return nil
 }
 
-func generateEmailVerificationLinkForUser(user *db.Account) (string, error) {
-	token, err := generateEmailVerificationTokenForUser(user)
+func generateEmailVerificationLinkForAccount(account *db.Account) (string, error) {
+	token, err := generateEmailVerificationTokenForAccount(account)
 	if err != nil {
 		return "", err
 	}
@@ -98,8 +98,8 @@ func generateEmailVerificationLinkForUser(user *db.Account) (string, error) {
 	return link, nil
 }
 
-func generateEmailVerificationTokenForUser(user *db.Account) (string, error) {
+func generateEmailVerificationTokenForAccount(account *db.Account) (string, error) {
 	purpose := tokens.EmailVerification
-	payload := map[string]string{"UserID": strconv.Itoa(int(user.ID))}
+	payload := map[string]string{"AccountID": strconv.Itoa(int(account.ID))}
 	return tokens.GenerateTokenFor(purpose, payload)
 }

@@ -11,7 +11,7 @@ type VerifyEmailParams struct {
 	Token string `query:"verification_token"`
 }
 
-//encore:api public method=GET path=/verify_email
+//encore:api public method=GET path=/verify_user_email
 func (s *Service) VerifyEmail(ctx context.Context, params *VerifyEmailParams) error {
 	payload, err := tokens.GetPayloadForToken(tokens.EmailVerification, params.Token)
 	if err != nil {

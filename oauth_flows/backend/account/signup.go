@@ -57,7 +57,7 @@ func (s *Service) Signup(ctx context.Context, params *SignupParams) (*SignupResp
 
 	_, err = EmailVerificationRequested.Publish(
 		ctx,
-		&EmailVerificationRequestedEvent{UserID: account.ID},
+		&EmailVerificationRequestedEvent{AccountID: account.ID},
 	)
 	if err != nil {
 		rlog.Warn("Error publishing EmailVerificationRequestedEvent.", "err", err)
