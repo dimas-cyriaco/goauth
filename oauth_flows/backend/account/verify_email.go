@@ -25,7 +25,7 @@ func (s *Service) VerifyEmail(ctx context.Context, params *VerifyEmailParams) er
 		return nil
 	}
 
-	s.Query.VerifyEmail(ctx, accountID)
+	s.Query.MarkEmailAsVerified(ctx, accountID)
 
 	return nil
 }

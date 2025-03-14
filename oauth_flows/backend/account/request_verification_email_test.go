@@ -44,7 +44,7 @@ func (suite *RequestEmailVerificationSuite) TestDoNotPublishIfAlreadyVerified() 
 	insertParams := db.InsertAccountParams{}
 	faker.FakeData(&insertParams)
 	acc := Must(suite.service.Query.InsertAccount(suite.ctx, insertParams))
-	Must(suite.service.Query.VerifyEmail(suite.ctx, acc.ID), nil)
+	Must(suite.service.Query.MarkEmailAsVerified(suite.ctx, acc.ID), nil)
 
 	params := RequestVerificationEmailParams{
 		Email: insertParams.Email,

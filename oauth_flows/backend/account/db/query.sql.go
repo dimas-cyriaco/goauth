@@ -110,13 +110,13 @@ func (q *Queries) ListAccounts(ctx context.Context) ([]Account, error) {
 	return items, nil
 }
 
-const verifyEmail = `-- name: VerifyEmail :exec
+const markEmailAsVerified = `-- name: MarkEmailAsVerified :exec
 UPDATE accounts
 set email_verified_at = CURRENT_TIMESTAMP
 WHERE email_verified_at is NULL and id = $1
 `
 
-func (q *Queries) VerifyEmail(ctx context.Context, id int64) error {
-	_, err := q.db.Exec(ctx, verifyEmail, id)
+func (q *Queries) MarkEmailAsVerified(ctx context.Context, id int64) error {
+	_, err := q.db.Exec(ctx, markEmailAsVerified, id)
 	return err
 }
