@@ -16,3 +16,12 @@ type Account struct {
 	UpdatedAt       pgtype.Timestamp
 	EmailVerifiedAt pgtype.Timestamp
 }
+
+type Session struct {
+	ID        int64
+	AccountID int64
+	UserAgent pgtype.Text
+	IpAddress pgtype.Text
+	CreatedAt pgtype.Timestamp
+	UpdatedAt pgtype.Timestamp
+}

@@ -17,7 +17,7 @@ func (suite *VerifyEmailTestSuit) TestVerifyEmail() {
 
 	accountID := Must(suite.RegisterAccount())
 
-	account := Must(suite.service.Query.ByID(suite.ctx, accountID))
+	account := Must(suite.service.Query.FindAccountByID(suite.ctx, accountID))
 
 	assert.Zero(suite.T(), account.EmailVerifiedAt)
 
@@ -34,7 +34,7 @@ func (suite *VerifyEmailTestSuit) TestVerifyEmail() {
 
 	assert.NoError(suite.T(), err)
 
-	account = Must(suite.service.Query.ByID(suite.ctx, accountID))
+	account = Must(suite.service.Query.FindAccountByID(suite.ctx, accountID))
 
 	assert.NotNil(suite.T(), account.EmailVerifiedAt)
 }

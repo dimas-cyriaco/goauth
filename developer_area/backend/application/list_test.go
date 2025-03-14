@@ -6,6 +6,7 @@ import (
 
 	"encore.app/developer_area/backend/internal/utils"
 	user_service "encore.app/developer_area/backend/user"
+	account_service "encore.app/oauth_flows/backend/account"
 	"encore.dev/beta/auth"
 	"encore.dev/beta/errs"
 	"encore.dev/et"
@@ -30,7 +31,7 @@ func (suite *ALSuite) TestListApplications() {
 	}
 	user := utils.Must(user_service.Registration(suite.ctx, &userParams))
 
-	et.OverrideAuthInfo(auth.UID(strconv.Itoa(user.ID)), &user_service.AuthData{})
+	et.OverrideAuthInfo(auth.UID(strconv.Itoa(user.ID)), &account_service.AuthData{})
 
 	appName := faker.Name()
 	suite.service.Create(suite.ctx, &ApplicationParams{Name: appName})
@@ -58,7 +59,7 @@ func (suite *ALSuite) TestShouldReturnPaginated() {
 	}
 	user := utils.Must(user_service.Registration(suite.ctx, &userParams))
 
-	et.OverrideAuthInfo(auth.UID(strconv.Itoa(user.ID)), &user_service.AuthData{})
+	et.OverrideAuthInfo(auth.UID(strconv.Itoa(user.ID)), &account_service.AuthData{})
 
 	firstAppName := faker.Name()
 	secondAppName := faker.Name()
@@ -108,7 +109,7 @@ func (suite *ALSuite) TestFilterByOwnerID() {
 	}
 	user := utils.Must(user_service.Registration(suite.ctx, &userParams))
 
-	et.OverrideAuthInfo(auth.UID(strconv.Itoa(user.ID)), &user_service.AuthData{})
+	et.OverrideAuthInfo(auth.UID(strconv.Itoa(user.ID)), &account_service.AuthData{})
 
 	appName := faker.Name()
 	suite.service.Create(suite.ctx, &ApplicationParams{Name: appName})

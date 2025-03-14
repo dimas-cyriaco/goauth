@@ -1,23 +1,22 @@
-package user
+package account
 
 import (
 	"strconv"
 	"testing"
 
-	"encore.app/developer_area/backend/internal/tokens"
-	"encore.app/developer_area/backend/internal/utils"
+	"encore.app/oauth_flows/backend/internal/tokens"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 )
 
 type AuthTestSuite struct {
-	UserTestSuite
+	AccountTestSuite
 }
 
 func (suite *AuthTestSuite) TestAuth() {
 	// Arrange
 
-	userID := utils.Must(suite.RegisterUser())
+	userID := Must(suite.RegisterAccount())
 
 	response := suite.Login()
 	sessionCookie := findCookieByName(response.Result().Cookies(), "session_token")
@@ -35,13 +34,13 @@ func (suite *AuthTestSuite) TestAuth() {
 	// Assert
 
 	assert.NoError(suite.T(), err)
-	assert.Equal(suite.T(), strconv.Itoa(userID), string(uid))
+	assert.Equal(suite.T(), strconv.Itoa(int(userID)), string(uid))
 }
 
 func (suite *AuthTestSuite) TestAuthShouldFailWithoutSessionToken() {
 	// Arrange
 
-	utils.Must(suite.RegisterUser())
+	Must(suite.RegisterAccount())
 
 	response := suite.Login()
 	sessionCookie := findCookieByName(response.Result().Cookies(), "session_token")
@@ -65,7 +64,7 @@ func (suite *AuthTestSuite) TestAuthShouldFailWithoutSessionToken() {
 func (suite *AuthTestSuite) TestAuthShouldFailWithoutCSRFToken() {
 	// Arrange
 
-	utils.Must(suite.RegisterUser())
+	Must(suite.RegisterAccount())
 
 	response := suite.Login()
 	sessionCookie := findCookieByName(response.Result().Cookies(), "session_token")

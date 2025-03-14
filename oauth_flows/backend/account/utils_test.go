@@ -2,6 +2,10 @@ package account
 
 import (
 	"context"
+	"net/http"
+	"net/http/httptest"
+	"net/url"
+	"strings"
 
 	"encore.dev/et"
 	"encore.dev/storage/sqldb"
@@ -49,29 +53,29 @@ func (suite *AccountTestSuite) RegisterAccount() (int64, error) {
 // Login performs a login request using the suite's default credentials.
 //
 // To use different credentials, use the `(suite *UserTestSuite) LoginWith(email, password string)` method.
-// func (suite *UserTestSuite) Login() *httptest.ResponseRecorder {
-// 	return suite.LoginWith(suite.email, suite.password)
-// }
+func (suite *AccountTestSuite) Login() *httptest.ResponseRecorder {
+	return suite.LoginWith(suite.email, suite.password)
+}
 
 // LoginWith performs a login request with the specified credentials.
 // It creates and executes an HTTP POST request to the /login endpoint with the given email and password.
-// func (suite *UserTestSuite) LoginWith(email, password string) *httptest.ResponseRecorder {
-// 	loginData := url.Values{
-// 		"email":    []string{email},
-// 		"password": []string{password},
-// 	}
-//
-// 	loginForm := strings.NewReader(loginData.Encode())
-//
-// 	request := httptest.NewRequest(http.MethodPost, "/login", loginForm)
-// 	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-//
-// 	response := httptest.NewRecorder()
-//
-// 	suite.service.Login(response, request)
-//
-// 	return response
-// }
+func (suite *AccountTestSuite) LoginWith(email, password string) *httptest.ResponseRecorder {
+	loginData := url.Values{
+		"email":    []string{email},
+		"password": []string{password},
+	}
+
+	loginForm := strings.NewReader(loginData.Encode())
+
+	request := httptest.NewRequest(http.MethodPost, "/login", loginForm)
+	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	response := httptest.NewRecorder()
+
+	suite.service.Login(response, request)
+
+	return response
+}
 
 // func (suite *UserTestSuite) findUserByID(userID int) (*User, error) {
 // 	var user User

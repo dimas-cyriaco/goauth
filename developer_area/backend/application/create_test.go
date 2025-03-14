@@ -6,6 +6,7 @@ import (
 
 	"encore.app/developer_area/backend/internal/utils"
 	user_service "encore.app/developer_area/backend/user"
+	account_service "encore.app/oauth_flows/backend/account"
 	"encore.dev/beta/auth"
 	"encore.dev/et"
 	"github.com/go-faker/faker/v4"
@@ -29,7 +30,7 @@ func (suite *ACSuite) TestCreatesApplication() {
 	}
 	user := utils.Must(user_service.Registration(suite.ctx, &userParams))
 
-	et.OverrideAuthInfo(auth.UID(strconv.Itoa(user.ID)), &user_service.AuthData{})
+	et.OverrideAuthInfo(auth.UID(strconv.Itoa(user.ID)), &account_service.AuthData{})
 
 	// Act
 
@@ -56,7 +57,7 @@ func (suite *ACSuite) TestShouldReturnPage() {
 	}
 	user := utils.Must(user_service.Registration(suite.ctx, &userParams))
 
-	et.OverrideAuthInfo(auth.UID(strconv.Itoa(user.ID)), &user_service.AuthData{})
+	et.OverrideAuthInfo(auth.UID(strconv.Itoa(user.ID)), &account_service.AuthData{})
 
 	firstAppName := faker.Name()
 	secondAppName := faker.Name()

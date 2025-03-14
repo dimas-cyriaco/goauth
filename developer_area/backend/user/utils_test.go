@@ -31,6 +31,7 @@ func GetUserTestService(ctx context.Context) *Service {
 func (suite *UserTestSuite) SetupTest() {
 	suite.ctx = context.Background()
 	suite.db = utils.Must(et.NewTestDatabase(suite.ctx, "user"))
+	utils.Must(et.NewTestDatabase(suite.ctx, "user_sessions"))
 	suite.service = utils.Must(NewUserService(suite.db))
 
 	suite.email = faker.Email()

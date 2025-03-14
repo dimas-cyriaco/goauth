@@ -1,27 +1,28 @@
-package user
+package account
 
 import (
+	"context"
 	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
 	"net/http"
 	"strconv"
 
-	"encore.app/developer_area/backend/internal/tokens"
+	"encore.app/oauth_flows/backend/account/db"
+	"encore.app/oauth_flows/backend/internal/tokens"
 )
 
-//encore:api public raw method=POST path=/user_login
+//encore:api public raw method=POST path=/login
 func (s *Service) Login(response http.ResponseWriter, request *http.Request) {
 	response.Header().Set("Content-Type", "application/json")
 
 	email := request.FormValue("email")
 	password := request.FormValue("password")
 
-	var user User
-	err := s.db.
-		Where("email = $1", email).
-		First(&user).
-		Error
+	// var user db.Account
+	ctx := context.Background()
+
+	user, err := s.Query.FindAccountByEmail(ctx, email)
 	if err != nil {
 		http.Error(response, "wrong email or password", http.StatusUnauthorized)
 		return
@@ -33,8 +34,8 @@ func (s *Service) Login(response http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	session := Session{UserID: user.ID}
-	err = s.db.Create(&session).Error
+	sessionParams := db.InsertSessionParams{AccountID: user.ID}
+	session, err := s.Query.InsertSession(ctx, sessionParams)
 	if err != nil {
 		http.Error(response, "wrong email or password", http.StatusUnauthorized)
 		return
