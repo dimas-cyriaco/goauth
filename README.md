@@ -34,6 +34,27 @@ Run the following command to run the Process Compose UI:
 mise pc:ui
 ```
 
+## 🤫 Secrets
+
+This step is optional, and is only needed to run the CI tasks locally.
+
+Some secrets are managed through
+[Mise](https://mise.jdx.dev/environments/secrets.html) and the encrypted file
+`.env.secrets.json`. If you don't have access to the encryption key, you can
+recreate this file with your own data using `sops`:
+
+1. Edit the `.env.secrets.json` to be on the format:
+
+```json
+{
+    "ENCORE_AUTH_KEY": "key"
+}
+```
+
+2. Run: `sops encrypt --age age-key .env.secrets.json --inplace`
+
+This will encrypt the file and allow Mise to set the variables automatically.
+
 ## Systems
 
 ### [WIP] Developer Area
@@ -41,5 +62,3 @@ mise pc:ui
 This is where the developers create/manage their apps
 
 ### [TODO] OAuth Flows
-
-<https://encore.dev/docs/go/how-to/debug>

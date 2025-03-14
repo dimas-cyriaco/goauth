@@ -1,9 +1,8 @@
-package account_test
+package account
 
 import (
 	"context"
 
-	"encore.app/oauth_flows/backend/account"
 	"encore.dev/et"
 	"encore.dev/storage/sqldb"
 	"github.com/go-faker/faker/v4"
@@ -14,20 +13,20 @@ type AccountTestSuite struct {
 	suite.Suite
 	ctx      context.Context
 	db       *sqldb.Database
-	service  *account.Service
+	service  *Service
 	email    string
 	password string
 }
 
-func GetAccountTestService(ctx context.Context) *account.Service {
+func GetAccountTestService(ctx context.Context) *Service {
 	db := Must(et.NewTestDatabase(ctx, "account"))
-	return Must(account.NewAccountService(db))
+	return Must(NewAccountService(db))
 }
 
 func (suite *AccountTestSuite) SetupTest() {
 	suite.ctx = context.Background()
 	suite.db = Must(et.NewTestDatabase(suite.ctx, "account"))
-	suite.service = Must(account.NewAccountService(suite.db))
+	suite.service = Must(NewAccountService(suite.db))
 
 	suite.email = faker.Email()
 	suite.password = faker.Password()
@@ -37,7 +36,7 @@ func (suite *AccountTestSuite) SetupTest() {
 //
 // It uses the default suite email and password to register a new Account.
 func (suite *AccountTestSuite) RegisterAccount() (int64, error) {
-	params := account.SignupParams{
+	params := SignupParams{
 		Email:                suite.email,
 		Password:             suite.password,
 		PasswordConfirmation: suite.password,
