@@ -20,29 +20,28 @@ type MeResponse struct {
 
 //encore:api auth method=GET path=/me
 func (s *Service) Me(ctx context.Context) (*MeResponse, error) {
-	userID, hasUserId := auth.UserID()
-	if !hasUserId {
+	accountID, hasAccountId := auth.UserID()
+	if !hasAccountId {
 		return nil, &errs.Error{Code: errs.Unauthenticated, Message: "unauthenticated"}
 	}
 
-	uid, err := strconv.ParseInt(string(userID), 10, 64)
+	aID, err := strconv.ParseInt(string(accountID), 10, 64)
 	if err != nil {
 		rlog.Error("Error converting sessionID to int64.", "err", err)
 		return nil, err
 	}
 
-	// var user User
-	user, err := s.Query.FindAccountByID(ctx, uid)
+	account, err := s.Query.FindAccountByID(ctx, aID)
 	if err != nil {
 		return nil, err
 	}
 
 	response := MeResponse{
-		ID:              user.ID,
-		Email:           user.Email,
-		CreatedAt:       user.CreatedAt.Time,
-		UpdatedAt:       user.UpdatedAt.Time,
-		EmailVerifiedAt: &user.EmailVerifiedAt.Time,
+		ID:              account.ID,
+		Email:           account.Email,
+		CreatedAt:       account.CreatedAt.Time,
+		UpdatedAt:       account.UpdatedAt.Time,
+		EmailVerifiedAt: &account.EmailVerifiedAt.Time,
 	}
 	return &response, nil
 }

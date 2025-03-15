@@ -14,12 +14,12 @@ type MeTestSuite struct {
 	AccountTestSuite
 }
 
-func (suite *MeTestSuite) TestShouldReturnCurrentLoggedInUserData() {
+func (suite *MeTestSuite) TestShouldReturnCurrentLoggedInAccountData() {
 	// Arrange
 
-	userID := Must(suite.RegisterAccount())
+	accountID := Must(suite.RegisterAccount())
 
-	et.OverrideAuthInfo(auth.UID(strconv.Itoa(int(userID))), &AuthData{})
+	et.OverrideAuthInfo(auth.UID(strconv.Itoa(int(accountID))), &AuthData{})
 
 	// Act
 
@@ -29,7 +29,7 @@ func (suite *MeTestSuite) TestShouldReturnCurrentLoggedInUserData() {
 
 	assert.NoError(suite.T(), err)
 	assert.NotNil(suite.T(), me)
-	assert.Equal(suite.T(), userID, me.ID)
+	assert.Equal(suite.T(), accountID, me.ID)
 }
 
 func TestMeTestSuite(t *testing.T) {
