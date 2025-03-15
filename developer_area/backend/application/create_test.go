@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"encore.app/developer_area/backend/internal/utils"
-	user_service "encore.app/developer_area/backend/user"
 	account_service "encore.app/oauth_flows/backend/account"
 	"encore.dev/beta/auth"
 	"encore.dev/et"
@@ -23,14 +22,14 @@ func (suite *ACSuite) TestCreatesApplication() {
 
 	email := faker.Email()
 	password := faker.Password()
-	userParams := user_service.RegistrationParams{
+	userParams := account_service.SignupParams{
 		Email:                email,
 		Password:             password,
 		PasswordConfirmation: password,
 	}
-	user := utils.Must(user_service.Registration(suite.ctx, &userParams))
+	user := utils.Must(account_service.Signup(suite.ctx, &userParams))
 
-	et.OverrideAuthInfo(auth.UID(strconv.Itoa(user.ID)), &account_service.AuthData{})
+	et.OverrideAuthInfo(auth.UID(strconv.Itoa(int(user.ID))), &account_service.AuthData{})
 
 	// Act
 
@@ -50,14 +49,14 @@ func (suite *ACSuite) TestShouldReturnPage() {
 
 	email := faker.Email()
 	password := faker.Password()
-	userParams := user_service.RegistrationParams{
+	userParams := account_service.SignupParams{
 		Email:                email,
 		Password:             password,
 		PasswordConfirmation: password,
 	}
-	user := utils.Must(user_service.Registration(suite.ctx, &userParams))
+	user := utils.Must(account_service.Signup(suite.ctx, &userParams))
 
-	et.OverrideAuthInfo(auth.UID(strconv.Itoa(user.ID)), &account_service.AuthData{})
+	et.OverrideAuthInfo(auth.UID(strconv.Itoa(int(user.ID))), &account_service.AuthData{})
 
 	firstAppName := faker.Name()
 	secondAppName := faker.Name()

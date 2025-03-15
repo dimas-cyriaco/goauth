@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"encore.app/developer_area/backend/internal/utils"
-	user_service "encore.app/developer_area/backend/user"
 	account_service "encore.app/oauth_flows/backend/account"
 	"encore.dev/beta/auth"
 	"encore.dev/beta/errs"
@@ -24,14 +23,14 @@ func (suite *ALSuite) TestListApplications() {
 
 	email := faker.Email()
 	password := faker.Password()
-	userParams := user_service.RegistrationParams{
+	userParams := account_service.SignupParams{
 		Email:                email,
 		Password:             password,
 		PasswordConfirmation: password,
 	}
-	user := utils.Must(user_service.Registration(suite.ctx, &userParams))
+	user := utils.Must(account_service.Signup(suite.ctx, &userParams))
 
-	et.OverrideAuthInfo(auth.UID(strconv.Itoa(user.ID)), &account_service.AuthData{})
+	et.OverrideAuthInfo(auth.UID(strconv.Itoa(int(user.ID))), &account_service.AuthData{})
 
 	appName := faker.Name()
 	suite.service.Create(suite.ctx, &ApplicationParams{Name: appName})
@@ -52,14 +51,14 @@ func (suite *ALSuite) TestShouldReturnPaginated() {
 
 	email := faker.Email()
 	password := faker.Password()
-	userParams := user_service.RegistrationParams{
+	userParams := account_service.SignupParams{
 		Email:                email,
 		Password:             password,
 		PasswordConfirmation: password,
 	}
-	user := utils.Must(user_service.Registration(suite.ctx, &userParams))
+	user := utils.Must(account_service.Signup(suite.ctx, &userParams))
 
-	et.OverrideAuthInfo(auth.UID(strconv.Itoa(user.ID)), &account_service.AuthData{})
+	et.OverrideAuthInfo(auth.UID(strconv.Itoa(int(user.ID))), &account_service.AuthData{})
 
 	firstAppName := faker.Name()
 	secondAppName := faker.Name()
@@ -102,14 +101,14 @@ func (suite *ALSuite) TestFilterByOwnerID() {
 
 	email := faker.Email()
 	password := faker.Password()
-	userParams := user_service.RegistrationParams{
+	userParams := account_service.SignupParams{
 		Email:                email,
 		Password:             password,
 		PasswordConfirmation: password,
 	}
-	user := utils.Must(user_service.Registration(suite.ctx, &userParams))
+	user := utils.Must(account_service.Signup(suite.ctx, &userParams))
 
-	et.OverrideAuthInfo(auth.UID(strconv.Itoa(user.ID)), &account_service.AuthData{})
+	et.OverrideAuthInfo(auth.UID(strconv.Itoa(int(user.ID))), &account_service.AuthData{})
 
 	appName := faker.Name()
 	suite.service.Create(suite.ctx, &ApplicationParams{Name: appName})

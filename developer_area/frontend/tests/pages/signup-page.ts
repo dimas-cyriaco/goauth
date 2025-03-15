@@ -56,9 +56,7 @@ export class SignupPage {
     await this.clickSubmit()
   }
 
-  static async createUser(
-    page: Page,
-  ): Promise<{ email: string; password: string }> {
+  static async createUser(page: Page): Promise<{ email: string; password: string }> {
     const signupPage = new SignupPage(page)
 
     const email = faker.internet.email()

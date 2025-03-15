@@ -23,7 +23,7 @@ export const Signin = () => {
     body.set('password', password())
 
     try {
-      await client.user.Login('POST', body, { credentials: 'include' })
+      await client.account.Login('POST', body, { credentials: 'include' })
       setError(undefined)
       login()
       navigate('/')

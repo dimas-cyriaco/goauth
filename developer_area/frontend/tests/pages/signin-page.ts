@@ -48,11 +48,7 @@ export class SigninPage {
     await this.clickSubmit()
   }
 
-  static async login(
-    page: Page,
-    email: string,
-    password: string,
-  ): Promise<void> {
+  static async login(page: Page, email: string, password: string): Promise<void> {
     const signinPage = new SigninPage(page)
 
     await signinPage.goto()
