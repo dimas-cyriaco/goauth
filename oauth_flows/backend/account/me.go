@@ -1,15 +1,17 @@
-package user
+package account
 
 import (
 	"context"
+	"strconv"
 	"time"
 
 	"encore.dev/beta/auth"
 	"encore.dev/beta/errs"
+	"encore.dev/rlog"
 )
 
 type MeResponse struct {
-	ID              int        `json:"id"`
+	ID              int64      `json:"id"`
 	Email           string     `json:"email" encore:"sensitive"`
 	CreatedAt       time.Time  `json:"created_at"`
 	UpdatedAt       time.Time  `json:"updated_at"`
@@ -23,17 +25,24 @@ func (s *Service) Me(ctx context.Context) (*MeResponse, error) {
 		return nil, &errs.Error{Code: errs.Unauthenticated, Message: "unauthenticated"}
 	}
 
-	var user User
-	if err := s.db.Where("id = $1", userID).First(&user).Error; err != nil {
+	uid, err := strconv.ParseInt(string(userID), 10, 64)
+	if err != nil {
+		rlog.Error("Error converting sessionID to int64.", "err", err)
+		return nil, err
+	}
+
+	// var user User
+	user, err := s.Query.FindAccountByID(ctx, uid)
+	if err != nil {
 		return nil, err
 	}
 
 	response := MeResponse{
 		ID:              user.ID,
 		Email:           user.Email,
-		CreatedAt:       user.CreatedAt,
-		UpdatedAt:       user.UpdatedAt,
-		EmailVerifiedAt: user.EmailVerifiedAt,
+		CreatedAt:       user.CreatedAt.Time,
+		UpdatedAt:       user.UpdatedAt.Time,
+		EmailVerifiedAt: &user.EmailVerifiedAt.Time,
 	}
 	return &response, nil
 }

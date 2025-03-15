@@ -19,7 +19,6 @@ func (s *Service) Login(response http.ResponseWriter, request *http.Request) {
 	email := request.FormValue("email")
 	password := request.FormValue("password")
 
-	// var user db.Account
 	ctx := context.Background()
 
 	user, err := s.Query.FindAccountByEmail(ctx, email)
