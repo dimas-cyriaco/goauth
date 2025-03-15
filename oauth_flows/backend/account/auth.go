@@ -1,16 +1,16 @@
-package user
+package account
 
 import (
 	"context"
 	"net/http"
 	"strconv"
 
-	"encore.app/developer_area/backend/internal/tokens"
+	"encore.app/oauth_flows/backend/account/db"
+	"encore.app/oauth_flows/backend/internal/tokens"
 	"encore.dev/beta/auth"
 	"encore.dev/beta/errs"
+	"encore.dev/rlog"
 	"encore.dev/storage/sqldb"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 )
 
 type AuthData struct {
@@ -20,10 +20,12 @@ type AuthData struct {
 
 //encore:authhandler
 func AuthHandler(ctx context.Context, data *AuthData) (auth.UID, *AuthData, error) {
-	return HandleAuthentication(db, data)
+	return HandleAuthentication(accountsDB, data)
 }
 
 func HandleAuthentication(database *sqldb.Database, data *AuthData) (auth.UID, *AuthData, error) {
+	ctx := context.Background()
+
 	if data.SessionToken == nil || data.CSRFToken == "" {
 		return auth.UID(""), data, &errs.Error{Code: errs.Unauthenticated, Message: "Invalid SessionToken or CSRFToken"}
 	}
@@ -38,18 +40,19 @@ func HandleAuthentication(database *sqldb.Database, data *AuthData) (auth.UID, *
 		return auth.UID(""), data, &errs.Error{Code: errs.Unauthenticated, Message: "Invalid CSRFToken"}
 	}
 
-	gorm, err := gorm.Open(postgres.New(postgres.Config{Conn: database.Stdlib()}))
+	sessionID, err := strconv.ParseInt(sessionPayload["SessionID"], 10, 64)
 	if err != nil {
-		return auth.UID(""), data, err
+		rlog.Error("Error converting sessionID to int64.", "err", err)
+		return auth.UID(""), data, &errs.Error{Code: errs.Unauthenticated, Message: "Invalid sessionID"}
 	}
 
-	sessionID := sessionPayload["SessionID"]
+	pgxdb := sqldb.Driver(database)
+	query := db.New(pgxdb)
 
-	var session Session
-	err = gorm.Where("id = $1", sessionID).First(&session).Error
+	session, err := query.FindSessionByID(ctx, sessionID)
 	if err != nil {
-		return auth.UID(strconv.Itoa(session.ID)), data, err
+		return auth.UID(strconv.Itoa(int(session.ID))), data, err
 	}
 
-	return auth.UID(strconv.Itoa(session.UserID)), data, nil
+	return auth.UID(strconv.Itoa(int(session.AccountID))), data, nil
 }

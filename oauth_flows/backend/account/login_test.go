@@ -1,23 +1,23 @@
-package user
+package account
 
 import (
 	"net/http"
 	"strconv"
 	"testing"
 
-	"encore.app/developer_area/backend/internal/tokens"
+	"encore.app/oauth_flows/backend/internal/tokens"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 )
 
 type LoginTestSuite struct {
-	UserTestSuite
+	AccountTestSuite
 }
 
 func (suite *LoginTestSuite) TestLogin() {
 	// Arrange
 
-	suite.RegisterUser()
+	suite.RegisterAccount()
 
 	// Act
 
@@ -32,7 +32,7 @@ func (suite *LoginTestSuite) TestLogin() {
 func (suite *LoginTestSuite) TestShouldFailWithWrongPassword() {
 	// Arrange
 
-	suite.RegisterUser()
+	suite.RegisterAccount()
 
 	// Act
 
@@ -47,7 +47,7 @@ func (suite *LoginTestSuite) TestShouldFailWithWrongPassword() {
 func (suite *LoginTestSuite) TestShouldFailWithWrongEmail() {
 	// Arrange
 
-	suite.RegisterUser()
+	suite.RegisterAccount()
 
 	// Act
 
@@ -62,9 +62,9 @@ func (suite *LoginTestSuite) TestShouldFailWithWrongEmail() {
 func (suite *LoginTestSuite) TestShouldCreateSession() {
 	// Arrange
 
-	suite.RegisterUser()
-	var countBefore int64
-	suite.service.db.Model(&Session{}).Count(&countBefore)
+	suite.RegisterAccount()
+
+	countBefore, _ := suite.service.Query.CountSessions(suite.ctx)
 
 	// Act
 
@@ -74,8 +74,7 @@ func (suite *LoginTestSuite) TestShouldCreateSession() {
 
 	assert.Equal(suite.T(), http.StatusOK, response.Code)
 
-	var countAfter int64
-	suite.service.db.Model(&Session{}).Count(&countAfter)
+	countAfter, _ := suite.service.Query.CountSessions(suite.ctx)
 
 	assert.Equal(suite.T(), countBefore+1, countAfter)
 }
@@ -83,7 +82,7 @@ func (suite *LoginTestSuite) TestShouldCreateSession() {
 func (suite *LoginTestSuite) TestShouldReturnSessionToken() {
 	// Arrange
 
-	suite.RegisterUser()
+	suite.RegisterAccount()
 
 	// Act
 
@@ -97,8 +96,9 @@ func (suite *LoginTestSuite) TestShouldReturnSessionToken() {
 	payload, err := tokens.GetPayloadForToken(tokens.SessionToken, sessionCookie.Value)
 	assert.NoError(suite.T(), err)
 
-	var session Session
-	suite.service.db.Model(&Session{}).Last(&session)
+	sessionID := Must(strconv.ParseInt(payload["SessionID"], 10, 64))
+	session := Must(suite.service.Query.FindSessionByID(suite.ctx, sessionID))
+
 	assert.Equal(suite.T(), payload["SessionID"], strconv.Itoa(int(session.ID)))
 }
 

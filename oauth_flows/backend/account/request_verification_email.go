@@ -12,7 +12,7 @@ type RequestVerificationEmailParams struct {
 
 //encore:api public method=POST path=/request_email_verification
 func (s *Service) RequestVerificationEmail(ctx context.Context, params *RequestVerificationEmailParams) error {
-	account, err := s.Query.ByEmail(ctx, params.Email)
+	account, err := s.Query.FindAccountByEmail(ctx, params.Email)
 	if err != nil {
 		if err.Error() == "record not found" {
 			return nil

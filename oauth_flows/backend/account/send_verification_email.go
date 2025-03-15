@@ -50,7 +50,7 @@ func SendVerificationEmail(ctx context.Context, event *EmailVerificationRequeste
 	pgxdb := sqldb.Driver(database)
 	query := db.New(pgxdb)
 
-	account, err := query.ByID(ctx, event.AccountID)
+	account, err := query.FindAccountByID(ctx, event.AccountID)
 	if err != nil {
 		return err
 	}

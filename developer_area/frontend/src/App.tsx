@@ -58,7 +58,7 @@ function WithAuth(Component: Component) {
 const fetchMe = async () => {
   try {
     const client = createAPIClient()
-    const me = await client.user.Me()
+    const me = await client.account.Me()
     return !!me
   } catch {
     return false

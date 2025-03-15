@@ -1,7 +1,7 @@
 import { useNavigate } from '@solidjs/router'
 import { Show, createSignal } from 'solid-js'
 
-import { isAPIError, user } from '../lib/client'
+import { account, isAPIError } from '../lib/client'
 import { createAPIClient } from '../lib/clientUtils'
 
 export const Signup = () => {
@@ -19,14 +19,14 @@ export const Signup = () => {
 
     const client = createAPIClient()
 
-    const registrationParams: user.RegistrationParams = {
+    const registrationParams: account.SignupParams = {
       email: email(),
       password: password(),
       password_confirmation: passwordConfirmation(),
     }
 
     try {
-      await client.user.Registration(registrationParams)
+      await client.account.Signup(registrationParams)
       setErrors({})
       navigate('/signin')
     } catch (error) {

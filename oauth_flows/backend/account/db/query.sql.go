@@ -7,42 +7,19 @@ package db
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const byEmail = `-- name: ByEmail :one
-select id, email, hashed_password, created_at, updated_at, email_verified_at FROM accounts where email = $1
+const countSessions = `-- name: CountSessions :one
+select count(id) FROM sessions
 `
 
-func (q *Queries) ByEmail(ctx context.Context, email string) (Account, error) {
-	row := q.db.QueryRow(ctx, byEmail, email)
-	var i Account
-	err := row.Scan(
-		&i.ID,
-		&i.Email,
-		&i.HashedPassword,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-		&i.EmailVerifiedAt,
-	)
-	return i, err
-}
-
-const byID = `-- name: ByID :one
-select id, email, hashed_password, created_at, updated_at, email_verified_at FROM accounts where id = $1
-`
-
-func (q *Queries) ByID(ctx context.Context, id int64) (Account, error) {
-	row := q.db.QueryRow(ctx, byID, id)
-	var i Account
-	err := row.Scan(
-		&i.ID,
-		&i.Email,
-		&i.HashedPassword,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-		&i.EmailVerifiedAt,
-	)
-	return i, err
+func (q *Queries) CountSessions(ctx context.Context) (int64, error) {
+	row := q.db.QueryRow(ctx, countSessions)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
 }
 
 const deleteAccount = `-- name: DeleteAccount :exec
@@ -52,6 +29,78 @@ DELETE FROM accounts WHERE id = $1
 func (q *Queries) DeleteAccount(ctx context.Context, id int64) error {
 	_, err := q.db.Exec(ctx, deleteAccount, id)
 	return err
+}
+
+const findAccountByEmail = `-- name: FindAccountByEmail :one
+select id, email, hashed_password, created_at, updated_at, email_verified_at FROM accounts where email = $1
+`
+
+func (q *Queries) FindAccountByEmail(ctx context.Context, email string) (Account, error) {
+	row := q.db.QueryRow(ctx, findAccountByEmail, email)
+	var i Account
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.HashedPassword,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.EmailVerifiedAt,
+	)
+	return i, err
+}
+
+const findAccountByID = `-- name: FindAccountByID :one
+select id, email, hashed_password, created_at, updated_at, email_verified_at FROM accounts where id = $1
+`
+
+func (q *Queries) FindAccountByID(ctx context.Context, id int64) (Account, error) {
+	row := q.db.QueryRow(ctx, findAccountByID, id)
+	var i Account
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.HashedPassword,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.EmailVerifiedAt,
+	)
+	return i, err
+}
+
+const findSessionByID = `-- name: FindSessionByID :one
+select id, account_id, user_agent, ip_address, created_at, updated_at FROM sessions where id = $1
+`
+
+func (q *Queries) FindSessionByID(ctx context.Context, id int64) (Session, error) {
+	row := q.db.QueryRow(ctx, findSessionByID, id)
+	var i Session
+	err := row.Scan(
+		&i.ID,
+		&i.AccountID,
+		&i.UserAgent,
+		&i.IpAddress,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const findSessionID = `-- name: FindSessionID :one
+select id, account_id, user_agent, ip_address, created_at, updated_at FROM sessions where id = $1
+`
+
+func (q *Queries) FindSessionID(ctx context.Context, id int64) (Session, error) {
+	row := q.db.QueryRow(ctx, findSessionID, id)
+	var i Session
+	err := row.Scan(
+		&i.ID,
+		&i.AccountID,
+		&i.UserAgent,
+		&i.IpAddress,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
 }
 
 const insertAccount = `-- name: InsertAccount :one
@@ -75,6 +124,32 @@ func (q *Queries) InsertAccount(ctx context.Context, arg InsertAccountParams) (A
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.EmailVerifiedAt,
+	)
+	return i, err
+}
+
+const insertSession = `-- name: InsertSession :one
+INSERT INTO sessions (account_id, user_agent, ip_address)
+VALUES ($1, $2, $3)
+RETURNING id, account_id, user_agent, ip_address, created_at, updated_at
+`
+
+type InsertSessionParams struct {
+	AccountID int64
+	UserAgent pgtype.Text
+	IpAddress pgtype.Text
+}
+
+func (q *Queries) InsertSession(ctx context.Context, arg InsertSessionParams) (Session, error) {
+	row := q.db.QueryRow(ctx, insertSession, arg.AccountID, arg.UserAgent, arg.IpAddress)
+	var i Session
+	err := row.Scan(
+		&i.ID,
+		&i.AccountID,
+		&i.UserAgent,
+		&i.IpAddress,
+		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
@@ -110,13 +185,13 @@ func (q *Queries) ListAccounts(ctx context.Context) ([]Account, error) {
 	return items, nil
 }
 
-const markEmailAsVerified = `-- name: MarkEmailAsVerified :exec
+const markAccountEmailAsVerified = `-- name: MarkAccountEmailAsVerified :exec
 UPDATE accounts
 set email_verified_at = CURRENT_TIMESTAMP
 WHERE email_verified_at is NULL and id = $1
 `
 
-func (q *Queries) MarkEmailAsVerified(ctx context.Context, id int64) error {
-	_, err := q.db.Exec(ctx, markEmailAsVerified, id)
+func (q *Queries) MarkAccountEmailAsVerified(ctx context.Context, id int64) error {
+	_, err := q.db.Exec(ctx, markAccountEmailAsVerified, id)
 	return err
 }

@@ -27,7 +27,7 @@ func (suite *AccSuite) TestCreatesUser() {
 
 	// Assert
 
-	user := Must(suite.service.Query.ByID(suite.ctx, response.ID))
+	user := Must(suite.service.Query.FindAccountByID(suite.ctx, response.ID))
 
 	assert.NotNil(suite.T(), response)
 	assert.NotNil(suite.T(), user)
@@ -177,7 +177,7 @@ func (suite *AccSuite) TestHashesPassword() {
 
 	// Assert
 
-	user := Must(suite.service.Query.ByID(suite.ctx, response.ID))
+	user := Must(suite.service.Query.FindAccountByID(suite.ctx, response.ID))
 
 	assert.NotEmpty(suite.T(), user.HashedPassword)
 	assert.NotEqual(suite.T(), params.Password, user.HashedPassword)

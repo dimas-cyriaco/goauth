@@ -1,10 +1,9 @@
-package user
+package account
 
 import (
 	"strconv"
 	"testing"
 
-	"encore.app/developer_area/backend/internal/utils"
 	"encore.dev/beta/auth"
 	"encore.dev/et"
 	"github.com/stretchr/testify/assert"
@@ -12,15 +11,15 @@ import (
 )
 
 type MeTestSuite struct {
-	UserTestSuite
+	AccountTestSuite
 }
 
-func (suite *MeTestSuite) TestShouldReturnCurrentLoggedInUserData() {
+func (suite *MeTestSuite) TestShouldReturnCurrentLoggedInAccountData() {
 	// Arrange
 
-	userID := utils.Must(suite.RegisterUser())
+	accountID := Must(suite.RegisterAccount())
 
-	et.OverrideAuthInfo(auth.UID(strconv.Itoa(userID)), &AuthData{})
+	et.OverrideAuthInfo(auth.UID(strconv.Itoa(int(accountID))), &AuthData{})
 
 	// Act
 
@@ -30,7 +29,7 @@ func (suite *MeTestSuite) TestShouldReturnCurrentLoggedInUserData() {
 
 	assert.NoError(suite.T(), err)
 	assert.NotNil(suite.T(), me)
-	assert.Equal(suite.T(), userID, me.ID)
+	assert.Equal(suite.T(), accountID, me.ID)
 }
 
 func TestMeTestSuite(t *testing.T) {
