@@ -2,6 +2,7 @@ package account
 
 import (
 	"net/http"
+	"strconv"
 	"testing"
 
 	"encore.app/oauth_flows/backend/internal/tokens"
@@ -62,9 +63,8 @@ func (suite *LoginTestSuite) TestShouldCreateSession() {
 	// Arrange
 
 	suite.RegisterAccount()
-	// var countBefore int64
-	// TODO:
-	// suite.service.db.Model(&Session{}).Count(&countBefore)
+
+	countBefore, _ := suite.service.Query.CountSessions(suite.ctx)
 
 	// Act
 
@@ -74,10 +74,9 @@ func (suite *LoginTestSuite) TestShouldCreateSession() {
 
 	assert.Equal(suite.T(), http.StatusOK, response.Code)
 
-	// var countAfter int64
-	// suite.service.db.Model(&Session{}).Count(&countAfter)
-	//
-	// assert.Equal(suite.T(), countBefore+1, countAfter)
+	countAfter, _ := suite.service.Query.CountSessions(suite.ctx)
+
+	assert.Equal(suite.T(), countBefore+1, countAfter)
 }
 
 func (suite *LoginTestSuite) TestShouldReturnSessionToken() {
@@ -94,13 +93,13 @@ func (suite *LoginTestSuite) TestShouldReturnSessionToken() {
 	sessionCookie := findCookieByName(response.Result().Cookies(), "session_token")
 	assert.NotNil(suite.T(), sessionCookie)
 
-	_, err := tokens.GetPayloadForToken(tokens.SessionToken, sessionCookie.Value)
+	payload, err := tokens.GetPayloadForToken(tokens.SessionToken, sessionCookie.Value)
 	assert.NoError(suite.T(), err)
 
-	// TODO:
-	// var session db.Session
-	// suite.service.db.Model(&Session{}).Last(&session)
-	// assert.Equal(suite.T(), payload["SessionID"], strconv.Itoa(int(session.ID)))
+	sessionID := Must(strconv.ParseInt(payload["SessionID"], 10, 64))
+	session := Must(suite.service.Query.FindSessionByID(suite.ctx, sessionID))
+
+	assert.Equal(suite.T(), payload["SessionID"], strconv.Itoa(int(session.ID)))
 }
 
 func TestLoginTestSuite(t *testing.T) {

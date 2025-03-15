@@ -27,3 +27,9 @@ RETURNING *;
 
 -- name: FindSessionByID :one
 select * FROM sessions where id = $1;
+
+-- name: CountSessions :one
+select count(id) FROM sessions;
+
+-- name: FindSessionID :one
+select * FROM sessions where id = $1;

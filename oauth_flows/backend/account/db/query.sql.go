@@ -11,6 +11,17 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const countSessions = `-- name: CountSessions :one
+select count(id) FROM sessions
+`
+
+func (q *Queries) CountSessions(ctx context.Context) (int64, error) {
+	row := q.db.QueryRow(ctx, countSessions)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const deleteAccount = `-- name: DeleteAccount :exec
 DELETE FROM accounts WHERE id = $1
 `
@@ -62,6 +73,24 @@ select id, account_id, user_agent, ip_address, created_at, updated_at FROM sessi
 
 func (q *Queries) FindSessionByID(ctx context.Context, id int64) (Session, error) {
 	row := q.db.QueryRow(ctx, findSessionByID, id)
+	var i Session
+	err := row.Scan(
+		&i.ID,
+		&i.AccountID,
+		&i.UserAgent,
+		&i.IpAddress,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const findSessionID = `-- name: FindSessionID :one
+select id, account_id, user_agent, ip_address, created_at, updated_at FROM sessions where id = $1
+`
+
+func (q *Queries) FindSessionID(ctx context.Context, id int64) (Session, error) {
+	row := q.db.QueryRow(ctx, findSessionID, id)
 	var i Session
 	err := row.Scan(
 		&i.ID,
