@@ -15,7 +15,10 @@ _.file = ".env.secrets.json"
 
 [tasks."gen:client:local"]
 description = "Build Typescript client (Local)"
-run = "encore gen client goauth-5g62 --output=./developer_area/frontend/src/lib/client.ts --env=local"
+run = [
+  "encore gen client goauth-5g62 --output=./developer_area/frontend/src/lib/client.ts --env=local",
+  "encore gen client goauth-5g62 --output=./oauth_flows/frontend/src/lib/client.ts --env=local",
+]
 
 [tasks."build:backend"]
 description = "Build Backend Docker images"
@@ -29,9 +32,13 @@ run = "gotestsum --raw-command -- encore test ./... -json"
 description = "Run Backend tests in watch mode"
 run = "gotestsum --watch --raw-command -- encore test ./... -json"
 
-[tasks."test:frontend"]
+[tasks."test:frontend:developer"]
 description = "Run Frontend tests"
 run = "pnpm --prefix developer_area/frontend exec playwright test --ui"
+
+[tasks."test:frontend:oauth"]
+description = "Run Frontend tests"
+run = "pnpm --prefix oauth_flows/frontend exec playwright test --ui"
 
 [tasks."test:frontend:headless"]
 description = "Run Frontend tests"
@@ -69,6 +76,10 @@ run = "process-compose process logs test-backend -f"
 description = "Run Backend"
 run = "encore run"
 
-[tasks."run:frontend"]
-description = "Run Frontend"
+[tasks."run:frontend:developer"]
+description = "Run Developer Area Frontend"
 run = "pnpm --prefix developer_area/frontend dev"
+
+[tasks."run:frontend:oauth"]
+description = "Run Oauth Frontend"
+run = "pnpm --prefix oauth_flows/frontend dev"

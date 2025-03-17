@@ -56,13 +56,13 @@ jobs:
           retry-all: false
 
       - name: Start frontend
-        working-directory: ./developer_area/frontend
+        working-directory: ./oauth_flows/frontend
         run: VITE_ENCORE_ENVIRONMENT="${{ vars.VITE_ENCORE_ENVIRONMENT }}" pnpm dev &
 
       - name: Wait for frontend healthcheck
         uses: jtalk/url-health-check-action@v4
         with:
-          url: http://localhost:5173/singup
+          url: http://localhost:5173/signup
           follow-redirect: false
           max-attempts: 12
           retry-delay: 5s
