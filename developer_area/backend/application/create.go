@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"encore.app/developer_area/backend/internal/utils"
+	"encore.app/internal/string_utils"
 	"encore.dev/beta/auth"
 	"encore.dev/beta/errs"
 	"encore.dev/rlog"
@@ -17,8 +18,10 @@ type ApplicationParams struct {
 }
 
 type ApplicationResponse struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
+	ID           int    `json:"id"`
+	ClientID     string `json:"client_id"`
+	ClientSecret string `json:"client_secret"`
+	Name         string `json:"name"`
 }
 
 func (params *ApplicationParams) Validate() error {
@@ -37,9 +40,22 @@ func (s *Service) Create(ctx context.Context, params *ApplicationParams) (*Appli
 	if err != nil {
 		return nil, &errs.Error{Code: errs.Unauthenticated, Message: "unauthenticated"}
 	}
+
+	clientID, err := string_utils.GenerateSecureRandomString(32)
+	if err != nil {
+		return nil, &errs.Error{Code: errs.Unknown, Message: "Error generating secure clientID"}
+	}
+
+	clientSecret, err := string_utils.GenerateSecureRandomString(64)
+	if err != nil {
+		return nil, &errs.Error{Code: errs.Unknown, Message: "Error generating secure clientSecret"}
+	}
+
 	application := &Application{
-		Name:    params.Name,
-		OwnerID: ownerID,
+		ClientID:     clientID,
+		ClientSecret: clientSecret,
+		Name:         params.Name,
+		OwnerID:      ownerID,
 	}
 
 	err = s.db.Create(application).Error
@@ -56,5 +72,10 @@ func (s *Service) Create(ctx context.Context, params *ApplicationParams) (*Appli
 		return nil, &errs.Error{Code: errs.Unknown, Message: "Unknown error"}
 	}
 
-	return &ApplicationResponse{ID: application.ID, Name: application.Name}, nil
+	return &ApplicationResponse{
+		ID:           application.ID,
+		ClientID:     application.ClientID,
+		ClientSecret: application.ClientSecret,
+		Name:         application.Name,
+	}, nil
 }

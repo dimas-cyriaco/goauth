@@ -9,11 +9,13 @@ import (
 )
 
 type Application struct {
-	ID        int       `json:"id"`
-	Name      string    `json:"name"`
-	OwnerID   int       `json:"owner_id"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID           int       `json:"id"`
+	ClientID     string    `json:"client_id"`
+	ClientSecret string    `json:"client_secret"`
+	Name         string    `json:"name"`
+	OwnerID      int       `json:"owner_id"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
 }
 
 //encore:service
