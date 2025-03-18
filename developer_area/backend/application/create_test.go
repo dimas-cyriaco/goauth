@@ -40,6 +40,8 @@ func (suite *ACSuite) TestCreatesApplication() {
 
 	assert.NoError(suite.T(), err)
 	assert.NotNil(suite.T(), application)
+	assert.NotEmpty(suite.T(), application.ClientID)
+	assert.NotEmpty(suite.T(), application.ClientSecret)
 	assert.Equal(suite.T(), applicationParams.Name, application.Name)
 }
 
