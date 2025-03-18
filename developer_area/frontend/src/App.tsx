@@ -8,8 +8,6 @@ import { createAPIClient } from './lib/clientUtils'
 import { ApplicationList } from './pages/ApplicationList'
 import { ApplicationNew } from './pages/ApplicationNew'
 import { Home } from './pages/Home'
-import { Signin } from './pages/Signin'
-import { Signup } from './pages/Signup'
 
 export default function App() {
   const [isLogged] = createResource(fetchMe)
@@ -31,8 +29,6 @@ export default function App() {
           <Route path="/" component={Home} />
           <Route path="/applications/new" component={WithAuth(ApplicationNew)} />
           <Route path="/applications" component={WithAuth(ApplicationList)} />
-          <Route path="/signup" component={Signup} />
-          <Route path="/signin" component={Signin} />
         </Router>
       </AuthContext.Provider>
     </Show>
